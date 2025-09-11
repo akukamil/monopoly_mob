@@ -2650,7 +2650,7 @@ dice={
 
 
 		this.roll_res=this.rnd1.toString()+this.rnd2.toString()
-
+		
 		//запускаем анимацию
 		this.roll_timer=setInterval(()=>{
 			this.rnd1=irnd(0,2)
@@ -3366,19 +3366,17 @@ auc={
 			timer.start()
 		}
 
-		//соперник сразу отказался, можно купить
+		//соперник сразу отказался, мы купили
 		if (this.state==='on_auc_dec'){
 			this.state=''
 			game_msgs.add('Вы купили с аукциона') //это когда соперник отказался от аукциона
-			objects.auc_cont.visible=false
 			common.buy(1,this.cur_cell)
 
 			//отправляем сопернику - покупка по обычной цене карточки
 			opponent.send({s:my_data.uid,type:'auc_buy',cell_id:this.cur_cell.id,tm:Date.now()})
 			
-			//перезапускаем ход, аукцион завершен
-			my_turn=this.g_my_turn
-			timer.start()
+			//аукцион завершен
+			this.close()
 		}
 	}
 
@@ -3868,12 +3866,12 @@ plans={
 		const mx = e.data.global.x/app.stage.scale.x
 		const my = e.data.global.y/app.stage.scale.y
 
-		if (my>250||my<200) return
+		if (mx>360||mx<240) return
 
 		let i=0
-		if (mx>220&&mx<340) i=0
-		if (mx>340&&mx<460) i=1
-		if (mx>460&&mx<580) i=2
+		if (my>360&&my<400) i=0
+		if (my>430&&my<470) i=1
+		if (my>500&&my<540) i=2
 
 		if (this.action_made){
 			sys_msg.add('Вы уже сделали выбор')
@@ -3989,7 +3987,11 @@ online_game={
 		sound.play('start2')
 
 		//показываем кнопки
-		objects.game_btns_cont.visible=true
+		objects.exit_bot_btn.visible=false
+		objects.chat_btn.visible=true
+		objects.stickers_btn.visible=true
+		objects.exch_btn.visible=true
+		objects.giveup_btn.visible=true
 		
 		
 		//общие параметры
@@ -4200,12 +4202,17 @@ bot_game={
 		opponent=this
 		
 		//показываем кнопки
-		objects.game_btns_cont.visible=true
 		objects.exit_bot_btn.visible=true
+		objects.chat_btn.visible=false
+		objects.stickers_btn.visible=false
+		objects.exch_btn.visible=false
+		objects.giveup_btn.visible=false
 		
 		this.plans_progress=[0,0,0]		
 		
 		objects.timer_text.text='!!!'
+		
+		
 		
 		for (let i=0;i<24;i++){
 
