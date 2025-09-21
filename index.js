@@ -5436,8 +5436,8 @@ main_menu={
 		this.prv_anim_tm=Date.now()
 		this.prv_bliq_tm=Date.now()
 
-		if (game_platform==='VK')
-			anim3.add(objects.vk_buttons_cont,{alpha:[0,1,'linear']}, true, 0.5);
+		//if (game_platform==='VK')
+		//	anim3.add(objects.vk_buttons_cont,{alpha:[0,1,'linear']}, true, 0.5);
 
 		this.process_timer=setInterval(()=>{this.process()},100)
 	
