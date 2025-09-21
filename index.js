@@ -406,12 +406,12 @@ class lb_player_card_class extends PIXI.Container{
 	constructor(x,y,place) {
 		super();
 
-		this.bcg=new PIXI.Sprite(assets.lb_player_card_bcg);
-		this.bcg.interactive=true;
-		this.bcg.pointerover=function(){this.tint=0x55ffff};
-		this.bcg.pointerout=function(){this.tint=0xffffff};
-		this.bcg.width = 370;
-		this.bcg.height = 70;
+		this.bcg=new PIXI.Sprite(assets.lb_player_card_bcg)
+		this.bcg.interactive=true
+		this.bcg.pointerover=function(){this.tint=0x55ffff}
+		this.bcg.pointerout=function(){this.tint=0xffffff}
+		this.bcg.width = 370
+		this.bcg.height = 70
 
 		this.place=new PIXI.BitmapText('', {fontName: 'mfont32',fontSize: 25,align: 'center'});
 		this.place.tint=0xffff00;
@@ -525,10 +525,10 @@ class chat_record_class extends PIXI.Container {
 		this.msg_bcg.x=this.avatar.x+45;
 		this.msg_bcg.y=this.avatar.y+2;
 
-		this.msg = new PIXI.BitmapText('Имя Фамил', {fontName: 'mfont32',fontSize: 19,lineSpacing:55,align: 'left'});
+		this.msg = new PIXI.BitmapText('Имя Фамил', {fontName: 'mfont32',fontSize: 17,lineSpacing:30,align: 'left'});
 		this.msg.x=this.avatar.x+75;
 		this.msg.y=this.avatar.y+30;
-		this.msg.maxWidth=450;
+		this.msg.maxWidth=290;
 		this.msg.anchor.set(0,0.5);
 		this.msg.tint = 0xffffff;
 
@@ -590,9 +590,9 @@ class chat_record_class extends PIXI.Container {
 
 		await this.update_avatar(msg_data.uid, this.avatar);
 
-		this.uid=msg_data.uid;
-		this.tm = msg_data.tm;
-		this.index = msg_data.index;
+		this.uid=msg_data.uid
+		this.tm = msg_data.tm
+		this.index = msg_data.index
 
 		this.name.set2(msg_data.name,150);
 		this.name.tint=this.nameToColor(msg_data.name);
@@ -1067,18 +1067,18 @@ chat={
 		this.processing=1;
 
 		//выбираем номер сообщения
-		const new_rec=this.get_oldest_or_free_msg();
-		const y_shift=await new_rec.set(data);
-		new_rec.y=this.last_record_end;
+		const new_rec=this.get_oldest_or_free_msg()
+		const y_shift=await new_rec.set(data)
+		new_rec.y=this.last_record_end
 
-		this.last_record_end += y_shift;
+		this.last_record_end += y_shift
 
 		if (!first_load)
-			lobby.inst_message(data);
+			lobby.inst_message(data)
 
 		//смещаем на одно сообщение (если чат не видим то без твина)
 		if (objects.chat_cont.visible)
-			await anim3.add(objects.chat_msg_cont,{y:[objects.chat_msg_cont.y,objects.chat_msg_cont.y-y_shift,'linear']},true, 0.05);
+			await anim3.add(objects.chat_msg_cont,{y:[objects.chat_msg_cont.y,objects.chat_msg_cont.y-y_shift,'linear']},true, 0.05)
 		else
 			objects.chat_msg_cont.y-=y_shift
 
@@ -1128,7 +1128,7 @@ chat={
 		let top_y=999999;
 		let bot_y=-999999
 		for(let rec of objects.chat_records){
-			if (rec.visible===true){
+			if (rec.visible){
 				const cur_abs_top=objects.chat_msg_cont.y+rec.y;
 				const cur_abs_bot=objects.chat_msg_cont.y+rec.y+rec.height;
 				if (cur_abs_top<top_y) top_y=cur_abs_top;
@@ -1155,14 +1155,14 @@ chat={
 
 	pointer_move(e){
 
-		if (!this.drag_chat) return;
-		const mx = e.data.global.x/app.stage.scale.x;
-		const my = e.data.global.y/app.stage.scale.y;
+		if (!this.drag_chat) return
+		const mx = e.data.global.x/app.stage.scale.x
+		const my = e.data.global.y/app.stage.scale.y
 
-		const dy=my-this.drag_sy;
-		this.drag_sy=my;
+		const dy=my-this.drag_sy
+		this.drag_sy=my
 
-		this.shift(dy);
+		this.shift(dy)
 
 	},
 
@@ -1189,8 +1189,8 @@ chat={
 		//проверяем движение чата вверх
 		if (dy<0){
 			const new_bottom=bot_y+dy;
-			const overlap=435-new_bottom;
-			if (new_bottom<435) dy+=overlap;
+			const overlap=785-new_bottom;
+			if (new_bottom<785) dy+=overlap;
 		}
 
 		//проверяем движение чата вниз
@@ -1198,6 +1198,7 @@ chat={
 			const new_top=top_y+dy;
 			if (new_top>50)
 				return;
+		
 		}
 
 		objects.chat_msg_cont.y+=dy;
@@ -1208,15 +1209,6 @@ chat={
 
 		this.shift(-delta*30)
 
-	},
-
-	make_hash() {
-	  let hash = '';
-	  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-	  for (let i = 0; i < 6; i++) {
-		hash += characters.charAt(Math.floor(Math.random() * characters.length));
-	  }
-	  return hash;
 	},
 
 	async write_btn_down(){
@@ -1499,7 +1491,7 @@ message={
 
 game_msgs={
 	
-	
+	total_edge:0,
 	activate(){
 	
 		objects.game_msgs_cont.y=objects.game_msgs_cont.sy
@@ -1518,14 +1510,24 @@ game_msgs={
 			return
 		}
 		objects.game_msgs.forEach(m=>m.alpha=0.7)
-		anim3.add(objects.game_msgs_cont,{y:[objects.game_msgs_cont.y, objects.game_msgs_cont.y+15,'linear']}, true, 0.25);
-		const last_rec=this.get_last_rec()
-		last_rec.y-=60
-		last_rec.text=t
-		last_rec.alpha=1
+
+		const free_msg=this.get_last_rec()
+		free_msg.text=t
 		
+		//габарит следующего сообщения
+		const box=free_msg.height>20?36:16
+		const half_box=box*0.5
+		
+		//ставим новое сообщение на верх кучи
+		free_msg.y=this.total_edge-half_box
+		
+		//край кучи
+		this.total_edge-=box
+		
+		//двигаем контейнер
+		anim3.add(objects.game_msgs_cont,{y:[objects.game_msgs_cont.y, objects.game_msgs_cont.sy-free_msg.y,'linear']}, true, 0.25);
 	},
-	
+
 	get_last_rec(){
 		
 		let last_rec=objects.game_msgs[0]
@@ -1534,7 +1536,6 @@ game_msgs={
 				last_rec=objects.game_msgs[i]
 		return last_rec
 	}
-	
 	
 	
 }
@@ -1703,7 +1704,7 @@ confirm_dialog = {
 
 keyboard={
 
-	ru_keys:[[49,122.05,79,161.12,'1'],[89,122.05,119,161.12,'2'],[129,122.05,159,161.12,'3'],[169,122.05,199,161.12,'4'],[209,122.05,239,161.12,'5'],[249,122.05,279,161.12,'6'],[289,122.05,319,161.12,'7'],[329,122.05,359,161.12,'8'],[369,122.05,399,161.12,'9'],[409,122.05,439,161.12,'0'],[490,122.05,540,161.12,'<'],[69,170.88,99,209.95,'Й'],[109,170.88,139,209.95,'Ц'],[149,170.88,179,209.95,'У'],[189,170.88,219,209.95,'К'],[229,170.88,259,209.95,'Е'],[269,170.88,299,209.95,'Н'],[309,170.88,339,209.95,'Г'],[349,170.88,379,209.95,'Ш'],[389,170.88,419,209.95,'Щ'],[429,170.88,459,209.95,'З'],[469,170.88,499,209.95,'Х'],[509,170.88,539,209.95,'Ъ'],[89,219.72,119,258.79,'Ф'],[129,219.72,159,258.79,'Ы'],[169,219.72,199,258.79,'В'],[209,219.72,239,258.79,'А'],[249,219.72,279,258.79,'П'],[289,219.72,319,258.79,'Р'],[329,219.72,359,258.79,'О'],[369,219.72,399,258.79,'Л'],[409,219.72,439,258.79,'Д'],[449,219.72,479,258.79,'Ж'],[489,219.72,519,258.79,'Э'],[69,268.56,99,307.63,'!'],[109,268.56,139,307.63,'Я'],[149,268.56,179,307.63,'Ч'],[189,268.56,219,307.63,'С'],[229,268.56,259,307.63,'М'],[269,268.56,299,307.63,'И'],[309,268.56,339,307.63,'Т'],[349,268.56,379,307.63,'Ь'],[389,268.56,419,307.63,'Б'],[429,268.56,459,307.63,'Ю'],[510,268.56,540,307.63,')'],[450,122.05,480,161.12,'?'],[29,317.4,179,356.47,'ЗАКРЫТЬ'],[189,317.4,419,356.47,' '],[429,317.4,569,356.47,'ОТПРАВИТЬ'],[530,219.72,560,258.79,','],[470,268.56,500,307.63,'('],[29,219.72,79,258.79,'EN']],
+	ru_keys:[[40.02,122.05,64.52,161.12,'1'],[72.68,122.05,97.18,161.12,'2'],[105.35,122.05,129.85,161.12,'3'],[138.02,122.05,162.52,161.12,'4'],[170.68,122.05,195.18,161.12,'5'],[203.35,122.05,227.85,161.12,'6'],[236.02,122.05,260.52,161.12,'7'],[268.68,122.05,293.18,161.12,'8'],[301.35,122.05,325.85,161.12,'9'],[334.02,122.05,358.52,161.12,'0'],[400.17,122.05,441,161.12,'<'],[56.35,170.88,80.85,209.95,'Й'],[89.02,170.88,113.52,209.95,'Ц'],[121.68,170.88,146.18,209.95,'У'],[154.35,170.88,178.85,209.95,'К'],[187.02,170.88,211.52,209.95,'Е'],[219.68,170.88,244.18,209.95,'Н'],[252.35,170.88,276.85,209.95,'Г'],[285.02,170.88,309.52,209.95,'Ш'],[317.68,170.88,342.18,209.95,'Щ'],[350.35,170.88,374.85,209.95,'З'],[383.02,170.88,407.52,209.95,'Х'],[415.68,170.88,440.18,209.95,'Ъ'],[72.68,219.72,97.18,258.79,'Ф'],[105.35,219.72,129.85,258.79,'Ы'],[138.02,219.72,162.52,258.79,'В'],[170.68,219.72,195.18,258.79,'А'],[203.35,219.72,227.85,258.79,'П'],[236.02,219.72,260.52,258.79,'Р'],[268.68,219.72,293.18,258.79,'О'],[301.35,219.72,325.85,258.79,'Л'],[334.02,219.72,358.52,258.79,'Д'],[366.68,219.72,391.18,258.79,'Ж'],[399.35,219.72,423.85,258.79,'Э'],[56.35,268.56,80.85,307.63,'!'],[89.02,268.56,113.52,307.63,'Я'],[121.68,268.56,146.18,307.63,'Ч'],[154.35,268.56,178.85,307.63,'С'],[187.02,268.56,211.52,307.63,'М'],[219.68,268.56,244.18,307.63,'И'],[252.35,268.56,276.85,307.63,'Т'],[285.02,268.56,309.52,307.63,'Ь'],[317.68,268.56,342.18,307.63,'Б'],[350.35,268.56,374.85,307.63,'Ю'],[416.5,268.56,441,307.63,')'],[367.5,122.05,392,161.12,'?'],[23.68,317.4,146.18,356.47,'ЗАКРЫТЬ'],[154.35,317.4,342.18,356.47,' '],[350.35,317.4,464.68,356.47,'ОТПРАВИТЬ'],[432.83,219.72,457.33,258.79,','],[383.83,268.56,408.33,307.63,'('],[23.68,219.72,64.51,258.79,'EN']],
 	en_keys:[[51,120.58,81,159.65,'1'],[91,120.58,121,159.65,'2'],[131,120.58,161,159.65,'3'],[171,120.58,201,159.65,'4'],[211,120.58,241,159.65,'5'],[251,120.58,281,159.65,'6'],[291,120.58,321,159.65,'7'],[331,120.58,361,159.65,'8'],[371,120.58,401,159.65,'9'],[411,120.58,441,159.65,'0'],[492,120.58,542,159.65,'<'],[111,169.42,141,208.49,'Q'],[151,169.42,181,208.49,'W'],[191,169.42,221,208.49,'E'],[231,169.42,261,208.49,'R'],[271,169.42,301,208.49,'T'],[311,169.42,341,208.49,'Y'],[351,169.42,381,208.49,'U'],[391,169.42,421,208.49,'I'],[431,169.42,461,208.49,'O'],[471,169.42,501,208.49,'P'],[131,218.26,161,257.33,'A'],[171,218.26,201,257.33,'S'],[211,218.26,241,257.33,'D'],[251,218.26,281,257.33,'F'],[291,218.26,321,257.33,'G'],[331,218.26,361,257.33,'H'],[371,218.26,401,257.33,'J'],[411,218.26,441,257.33,'K'],[451,218.26,481,257.33,'L'],[472,267.09,502,306.16,'('],[71,267.09,101,306.16,'!'],[151,267.09,181,306.16,'Z'],[191,267.09,221,306.16,'X'],[231,267.09,261,306.16,'C'],[271,267.09,301,306.16,'V'],[311,267.09,341,306.16,'B'],[351,267.09,381,306.16,'N'],[391,267.09,421,306.16,'M'],[512,267.09,542,306.16,')'],[452,120.58,482,159.65,'?'],[31,315.93,181,355,'CLOSE'],[191,315.93,421,355,' '],[431,315.93,571,355,'SEND'],[532,218.26,562,257.33,','],[31,218.26,81,257.33,'RU']],
 	layout:0,
 	resolver:0,
@@ -2081,6 +2082,7 @@ timer={
 			return
 		}
 
+
 		clearInterval(this.t)
 		this.t=setInterval(()=>this.tick(),1000)
 		this.sec_left=sec
@@ -2130,7 +2132,7 @@ timer={
 	},
 
 	tick(){
-
+		return
 		const tm=Date.now()
 		if (tm-this.prv_tm>5000||tm<this.prv_tm){
 			common.stop('timer_error');
@@ -2632,7 +2634,7 @@ dice={
 		}else{
 
 			//выбираем более интересные значения
-			for (let i=0;i<5;i++){
+			/*for (let i=0;i<5;i++){
 
 				this.rnd1=irnd(1,6)
 				this.rnd2=irnd(1,6)
@@ -2644,7 +2646,7 @@ dice={
 				if (next_cell.owner!==player)
 					break
 
-			}
+			}*/
 
 		}
 
@@ -2729,7 +2731,7 @@ big_msg = {
 
 		objects.big_msg_fb_btn.visible = (!my_data.blocked)&&params.fb&&my_data.games>=200
 
-		anim3.add(objects.big_msg_cont,{alpha:[0, 1,'linear'],scale_xy:[1,1.1,'ease2back']}, true, 0.2)
+		anim3.add(objects.big_msg_cont,{angle:[0,5,'ease2back'],alpha:[0, 1,'linear'],scale_xy:[1,1.1,'ease2back']}, true, 0.5)
 
 		//this.show_bonus_anim(objects.big_msg_energy,params.energy||0)
 
@@ -2788,7 +2790,7 @@ big_msg = {
 
 		sound.play('click');
 
-		anim3.add(objects.big_msg_cont,{scale_xy:[1,0.5,'easeInBack'],alpha:[1,0,'linear']}, false, 0.5)
+		anim3.add(objects.big_msg_cont,{angle:[0,5,'linear'],scale_xy:[1,0.5,'easeInBack'],alpha:[1,0,'linear']}, false, 0.5)
 		this.p_resolve("close");
 	}
 
@@ -2968,6 +2970,9 @@ city_dlg={
 	},
 
 	show(id){
+		
+		if(objects.auc_cont.visible)
+			return
 
 		const cell=cells_data[id]
 		//objects.cell_info_params.y=90
@@ -2976,8 +2981,6 @@ city_dlg={
 		anim3.add(objects.cell_info_cont,{alpha:[0, 1,'linear'],scale_xy:[1,1.1,'ease2back']}, true, 0.2);
 		this.update(cell)
 		sound.play('city_dlg')
-
-
 	},
 
 	buy(){
@@ -3092,13 +3095,21 @@ fin={
 		//отправляем сопернику
 		opponent.send({s:my_data.uid,type:'fin',tm:Date.now()})
 
+
+
+
 		//теперь уже не мой ход
 		my_turn_started=0
 		my_turn=0
 		
 		timer.start()
 
+		//убираем все окна
 		objects.roll_dice_btn.visible=false
+		objects.auc_cont.visible=false
+		objects.cell_info_cont.visible=false
+		objects.plans_cont.visible=false
+		objects.exch_cont.visible=false
 		
 		anim3.add(objects.end_turn_btn,{scale_xy:[0.666,0.2,'easeInBack'],alpha:[1,0,'linear']}, false, 0.15);
 	}
@@ -3320,8 +3331,8 @@ auc={
 		
 		if (this.g_my_turn)
 			common.show_done_btn()
-		else
-			common.opp_fin_move_event()
+		//else
+		//	common.opp_fin_move_event()
 		
 
 	},
@@ -3388,6 +3399,7 @@ casino={
 	roll_on:0,
 	state:'',
 	roll_sound_timer:0,
+	roll_rimer:0,
 
 	activate(){
 
@@ -3431,6 +3443,7 @@ casino={
 
 
 		clearInterval(this.roll_sound_timer)
+		clearInterval(this.roll_rimer)
 		const result=irnd(0,5)
 		objects.casino_icon.tilePosition.y=-90*result
 		let city_id=0
@@ -3490,6 +3503,15 @@ casino={
 		setTimeout(()=>{this.close()},1000)
 
 	},
+	
+	clear(){
+		
+		clearInterval(this.roll_sound_timer)
+		clearInterval(this.roll_rimer)
+		some_process.casino_roll=()=>{}
+		objects.casino_cont.visible=false
+		
+	},
 
 	btn1_down(){
 
@@ -3536,9 +3558,11 @@ casino={
 		objects.casino_btn1.alpha=0.5
 		objects.casino_btn2.alpha=0.5
 
-		setTimeout(()=>{this.stop();some_process.casino_roll=()=>{}},2500)
+		this.roll_timer=setTimeout(()=>{this.stop();some_process.casino_roll=()=>{}},2500)
 
-	}
+	},
+	
+
 
 }
 
@@ -4138,9 +4162,7 @@ online_game={
 		let result_info = res_array.find( p => p[0] === res)[2][LANG];
 
 		//выключаем элементы
-		objects.stop_bot_btn.visible=false
-		objects.timer_cont.visible=false
-				
+		objects.timer_cont.visible=false				
 
 		//воспроизводим звук
 		if (result_number === DRAW || result_number === LOSE)
@@ -4161,7 +4183,6 @@ online_game={
 		objects.plans_cont.visible=false
 		objects.casino_cont.visible=false
 		objects.exch_cont.visible=false
-		objects.game_buttons.visible=false
 		sys_msg.close()
 	},
 	
@@ -4177,7 +4198,6 @@ online_game={
 		objects.swords.visible=false;
 		objects.my_card_cont.visible=false;
 		objects.opp_card_cont.visible=false;
-		objects.game_buttons.visible=false;
 		set_state({state:'o'});
 
 	}
@@ -4334,8 +4354,8 @@ bot_game={
 		objects.auc_cont.visible=false
 		objects.cell_info_cont.visible=false
 		objects.plans_cont.visible=false
-		objects.casino_cont.visible=false
 		objects.exch_cont.visible=false
+		casino.clear()
 		scheduler.stop_all()
 		sys_msg.close()
 		
@@ -4556,7 +4576,7 @@ bot_game={
 				common.remove_empty_city(empty_city)
 				city_id=empty_city.id
 				sound.play('city_lost')
-				game_msgs.add('Соперник в казино город '+empty_city?.rus_name)
+				game_msgs.add('Соперник в казино проиграр город '+empty_city?.rus_name)
 			}else{
 				game_msgs.add('Соперник чуть не потерял город в казино')	
 			}
@@ -4609,8 +4629,7 @@ common={
 	activate(){
 
 		if (my_turn){
-			objects.roll_dice_btn.visible=true
-			objects.roll_dice_btn.scale_xy=0.666
+			this.opp_fin_move_event()
 			objects.end_turn_btn.visible=false
 		}else{
 			objects.roll_dice_btn.visible=false
@@ -4926,7 +4945,7 @@ common={
 		//расчет ренты за участок соперника
 		if (cell.owner===opp_player){
 
-			if (cell.type==='city'){				
+			if (cell.type==='city'){
 				
 				if (cell.owner===1){
 					//оппонент приземлился на мой участок
@@ -4966,8 +4985,8 @@ common={
 		//можно покупать и продавать что захочешь
 		if (cur_player===1) my_turn_started=1
 
-		//мой город
-		if (cell.owner===cur_player){
+		//если это просто мой город
+		if (cell.owner===cur_player&&cur_player===1){
 			//do nothing
 			this.show_done_btn()
 		}
@@ -5022,7 +5041,6 @@ common={
 	},
 
 	process_opp_move(move_data){
-		console.log(move_data)
 		
 		//ход получен значит соперник подтвердил
 		opponent.opp_conf_play=1
@@ -5151,7 +5169,8 @@ common={
 	opp_fin_move_event(){
 
 		sound.play('roll_btn')
-
+		
+		anim3.add(objects.action_btn_hl,{scale_xy:[0.666,2,'linear'],alpha:[1,0,'linear']}, true, 0.75)
 		anim3.add(objects.roll_dice_btn,{scale_xy:[0.3, 0.666,'easeOutBack']}, true, 0.25);
 		objects.roll_dice_btn.tint=objects.roll_dice_btn.base_tint
 		
@@ -5161,6 +5180,7 @@ common={
 	
 	show_done_btn(){
 		
+		anim3.add(objects.action_btn_hl,{scale_xy:[0.666,2,'linear'],alpha:[1,0,'linear']}, true, 0.75)
 		anim3.add(objects.end_turn_btn,{scale_xy:[0.3,0.666,'easeOutBack'],alpha:[0,1,'linear']}, true, 0.15)
 		
 	},
@@ -5252,7 +5272,7 @@ common={
 			sound.play('monopoly')
 			for (let city of country){
 				const cell_spr=objects.cells[city.id]
-				anim3.add(cell_spr.hl,{alpha:[0, 1,'ease2back']}, true, 2);
+				anim3.add(cell_spr.hl,{alpha:[0, 1,'ease2back']}, true, 2,false)
 			}
 		}
 		
@@ -5367,7 +5387,6 @@ common={
 		lobby.activate()
 		
 	}
-
 
 }
 
@@ -5639,7 +5658,7 @@ lobby={
 		//objects.bcg.texture=assets.lobby_bcg_img;
 		anim3.add(objects.bcg,{alpha:[0,1,'linear']}, true, 0.5);
 		anim3.add(objects.cards_cont,{alpha:[0, 1,'linear']}, true, 0.1);
-		anim3.add(objects.lobby_footer_cont,{y:[450, objects.lobby_footer_cont.sy,'linear']}, true, 0.1);
+		anim3.add(objects.lobby_footer_cont,{y:[800, objects.lobby_footer_cont.sy,'linear']}, true, 0.1);
 		anim3.add(objects.lobby_header_cont,{y:[-50, objects.lobby_header_cont.sy,'linear']}, true, 0.1);
 		objects.cards_cont.x=0;
 		this.on=1;
@@ -6931,7 +6950,7 @@ main_loader={
 		loader.add('exch_decline',git_src+'sounds/exch_decline.mp3')
 		loader.add('exch_select',git_src+'sounds/exch_select.mp3')
 		loader.add('clock',git_src+'sounds/clock.mp3')
-		loader.add('music',git_src+'sounds/music.mp3')
+		loader.add('music',git_src+'sounds/music2.mp3')
 
 		//прогресс
 		loader.onProgress.add((l,res)=>{
