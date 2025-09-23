@@ -943,7 +943,7 @@ chat={
 		else
 			objects.chat_enter_btn.texture=assets.chat_enter_img;
 
-		objects.chat_rules.text='Правила чата!\n1. Будьте вежливы: Общайтесь с другими игроками с уважением. Избегайте угроз, грубых выражений, оскорблений, конфликтов.\n2. Отправлять сообщения в чат могут игроки сыгравшие более 200 онлайн партий.\n3. За нарушение правил игрок может попасть в черный список.'
+		//objects.chat_rules.text='Правила чата!\n1. Будьте вежливы: Общайтесь с другими игроками с уважением. Избегайте угроз, грубых выражений, оскорблений, конфликтов.\n2. Отправлять сообщения в чат могут игроки сыгравшие более 200 онлайн партий.\n3. За нарушение правил игрок может попасть в черный список.'
 		if(my_data.blocked) objects.chat_rules.text='Вы не можете писать в чат, так как вы находитесь в черном списке';
 
 		this.shift(-2000);
@@ -1510,7 +1510,7 @@ game_msgs={
 			return
 		}
 		objects.game_msgs.forEach(m=>m.alpha=0.7)
-
+		
 		const free_msg=this.get_last_rec()
 		free_msg.text=t
 		
@@ -1520,6 +1520,7 @@ game_msgs={
 		
 		//ставим новое сообщение на верх кучи
 		free_msg.y=this.total_edge-half_box
+		free_msg.alpha=1
 		
 		//край кучи
 		this.total_edge-=box
@@ -2362,9 +2363,9 @@ pref={
 	music_set_switch(on){
 		
 		if (on)
-			anim3.add(objects.pref_music_slider,{x:[objects.pref_music_slider.x,707,'linear']}, true, 0.12)
+			anim3.add(objects.pref_music_slider,{x:[objects.pref_music_slider.x,140,'linear']}, true, 0.12)
 		else
-			anim3.add(objects.pref_music_slider,{x:[objects.pref_music_slider.x,667,'linear']}, true, 0.12)
+			anim3.add(objects.pref_music_slider,{x:[objects.pref_music_slider.x,100,'linear']}, true, 0.12)
 	},
 
 	sound_switch_down(){
@@ -2377,12 +2378,12 @@ pref={
 		if (sound.on){
 			sound.on=0;
 			this.send_info(['Звуки отключены','Sounds off'][LANG]);
-			anim3.add(objects.pref_sound_slider,{x:[objects.pref_sound_slider.x,667,'linear']}, true, 0.12)//-39
+			anim3.add(objects.pref_sound_slider,{x:[objects.pref_sound_slider.x,299,'linear']}, true, 0.12)//-39
 		}else{
 			sound.on=1;
 			sound.play('click');
 			this.send_info(['Звуки включены','Sounds on'][LANG]);
-			anim3.add(objects.pref_sound_slider,{x:[objects.pref_sound_slider.x,707,'linear']}, true, 0.12);
+			anim3.add(objects.pref_sound_slider,{x:[objects.pref_sound_slider.x,339,'linear']}, true, 0.12);
 		}
 
 	},
@@ -2562,7 +2563,7 @@ pref={
 
 		//убираем контейнер
 		anim3.add(objects.pref_cont,{x:[objects.pref_cont.x,-800,'linear']}, false, 0.4);
-		anim3.add(objects.pref_footer_cont,{y:[objects.pref_footer_cont.y,450,'linear']}, false, 0.4);
+		anim3.add(objects.pref_footer_cont,{y:[objects.pref_footer_cont.y,800,'linear']}, false, 0.4);
 
 	},
 
@@ -2583,7 +2584,7 @@ pref={
 		//показываем лобби
 		anim3.add(objects.cards_cont,{x:[800,0,'linear']}, true, 0.4);
 		anim3.add(objects.lobby_header_cont,{y:[-200,objects.lobby_header_cont.sy,'linear']}, true, 0.4);
-		anim3.add(objects.lobby_footer_cont,{y:[450,objects.lobby_footer_cont.sy,'linear']}, true, 0.4);
+		anim3.add(objects.lobby_footer_cont,{y:[800,objects.lobby_footer_cont.sy,'linear']}, true, 0.4);
 
 	},
 
@@ -4082,7 +4083,7 @@ online_game={
 		this.send_message()
 	},
 	
-	sticker_btn_down(){
+	stickers_btn_down(){
 		
 		if (anim3.any_on()||!this.on){
 			sound.play('locked');
@@ -4311,7 +4312,8 @@ bot_game={
 
 		//соперник купил если бот отказался сразу
 		if (data.type==='auc_buy'){
-
+			if (!auc.g_my_turn)
+				scheduler.add(()=>{common.opp_fin_move_event()},2000)
 		}
 
 		//торговля
@@ -4327,9 +4329,13 @@ bot_game={
 			const min_left=risk_map[country_size+''+my_in_country]
 
 			if(left_after_buy<min_left){
+				
 				scheduler.add(()=>{
 					auc.opp_bid({type:'auc_giveup'})
-				},1000)
+				},1000);
+				
+				if (!auc.g_my_turn)
+					scheduler.add(()=>{common.opp_fin_move_event()},2000)
 			}
 			else{
 				scheduler.add(()=>{auc.opp_bid({type:'auc_bid',bid:new_bid})},1000)
@@ -4339,7 +4345,8 @@ bot_game={
 
 		//игрок отказался и бот купил
 		if (data.type==='auc_giveup'){
-
+			if (!auc.g_my_turn)
+				scheduler.add(()=>{common.opp_fin_move_event()},1000)
 		}
 
 		//игрок завершил ход, ходит бот
@@ -4643,7 +4650,7 @@ common={
 
 		anim3.add(objects.game_btns_cont,{y:[800,objects.game_btns_cont.sy,'linear']}, true, 0.3)
 
-		objects.bcg.texture=assets.lobby_bcg
+		//objects.bcg.texture=assets.lobby_bcg
 		
 		//бонусы не платить ренту
 		this.my_no_rent_bonus=0
@@ -5443,7 +5450,7 @@ main_menu={
 	
 		
 		//кнопки
-		await anim3.add(objects.main_btn_cont,{x:[800,objects.main_btn_cont.sx,'linear'],alpha:[0,1,'linear']}, true, 0.75);
+		await anim3.add(objects.main_btn_cont,{y:[800,objects.main_btn_cont.sy,'linear'],alpha:[0,1,'linear']}, true, 0.75);
 
 	},
 
@@ -5502,7 +5509,7 @@ main_menu={
 
 		//anim3.add(objects.bcg,{alpha:[1,0]}, false, 0.5,'linear');
 
-		anim3.add(objects.main_btn_cont,{x:[objects.main_btn_cont.x,-800,'linear']}, false, 0.5);
+		anim3.add(objects.main_btn_cont,{y:[objects.main_btn_cont.y,800,'linear']}, false, 0.5);
 
 		//кнопки
 		anim3.add(objects.main_menu_cont,{alpha:[1,0,'linear']}, false, 0.5);
@@ -5718,7 +5725,7 @@ lobby={
 		set_state({state : 'o'});
 		
 		
-		objects.bcg.texture=assets.lobby_bcg
+		//objects.bcg.texture=assets.lobby_bcg
 
 		//создаем заголовки
 		const room_desc=['КОМНАТА #','ROOM #'][LANG]+room_name.slice(6);
@@ -5750,8 +5757,8 @@ lobby={
 
 		//меняем футер
 		anim3.add(objects.lobby_header_cont,{y:[objects.lobby_header_cont.y,-100,'linear']}, false, 0.2)
-		anim3.add(objects.lobby_footer_cont,{y:[objects.lobby_footer_cont.sy,450,'linear']}, true, 0.2)
-		anim3.add(objects.pref_footer_cont,{y:[450,objects.pref_footer_cont.sy,'linear']}, true, 0.4)
+		anim3.add(objects.lobby_footer_cont,{y:[objects.lobby_footer_cont.sy,800,'linear']}, true, 0.2)
+		anim3.add(objects.pref_footer_cont,{y:[800,objects.pref_footer_cont.sy,'linear']}, true, 0.4)
 		pref.activate();
 
 	},
@@ -7319,7 +7326,7 @@ async function init_game_env(lang) {
 	]);
 
 	//включаем музыку
-	//pref.init_music();
+	pref.init_music();
 
 	//идентификатор клиента
 	client_id = irnd(10,999999);
