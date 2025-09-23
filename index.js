@@ -4310,11 +4310,7 @@ bot_game={
 			},1000)
 		}
 
-		//соперник купил если бот отказался сразу
-		if (data.type==='auc_buy'){
-			if (!auc.g_my_turn)
-				scheduler.add(()=>{common.opp_fin_move_event()},2000)
-		}
+
 
 		//торговля
 		if (data.type==='auc_bid'){
@@ -4342,13 +4338,13 @@ bot_game={
 			}
 
 		}
-
-		//игрок отказался и бот купил
-		if (data.type==='auc_giveup'){
+		
+		//игрок купил, отказался или сдался
+		if (['auc_buy','auc_dec2','auc_giveup'].includes(data.type)){
 			if (!auc.g_my_turn)
-				scheduler.add(()=>{common.opp_fin_move_event()},1000)
+				scheduler.add(()=>{common.opp_fin_move_event()},2000)
 		}
-
+		
 		//игрок завершил ход, ходит бот
 		if (data.type==='fin'){
 			dice.roll_and_go(objects.yellow_chip)
