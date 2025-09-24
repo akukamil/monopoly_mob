@@ -419,7 +419,7 @@ class lb_player_card_class extends PIXI.Container{
 		this.place.y=22;
 
 		this.avatar=new PIXI.Sprite();
-		this.avatar.x=43;
+		this.avatar.x=50;
 		this.avatar.y=12;
 		this.avatar.width=this.avatar.height=45;
 
@@ -431,7 +431,7 @@ class lb_player_card_class extends PIXI.Container{
 
 
 		this.rating=new PIXI.BitmapText('', {fontName: 'mfont32',fontSize: 25,align: 'center'});
-		this.rating.x=298;
+		this.rating.x=305;
 		this.rating.tint=0xffffff;
 		this.rating.y=22;
 
@@ -474,30 +474,29 @@ class chat_record_class extends PIXI.Container {
 
 		super();
 
-		this.tm=0;
-		this.index=0;
-		this.uid='';
+		this.tm=0
+		this.index=0
+		this.uid=''
 
+		this.avatar = new PIXI.Graphics()
+		this.avatar.w=50
+		this.avatar.h=50
+		this.avatar.x=30
+		this.avatar.y=13
 
-		this.avatar = new PIXI.Graphics();
-		this.avatar.w=50;
-		this.avatar.h=50;
-		this.avatar.x=30;
-		this.avatar.y=13;
+		this.avatar_bcg = new PIXI.Sprite(assets.chat_avatar_bcg_img)
+		this.avatar_bcg.width=70
+		this.avatar_bcg.height=70
+		this.avatar_bcg.x=this.avatar.x-10
+		this.avatar_bcg.y=this.avatar.y-10
+		this.avatar_bcg.interactive=true
+		this.avatar_bcg.pointerdown=()=>chat.avatar_down(this)
 
-		this.avatar_bcg = new PIXI.Sprite(assets.chat_avatar_bcg_img);
-		this.avatar_bcg.width=70;
-		this.avatar_bcg.height=70;
-		this.avatar_bcg.x=this.avatar.x-10;
-		this.avatar_bcg.y=this.avatar.y-10;
-		this.avatar_bcg.interactive=true;
-		this.avatar_bcg.pointerdown=()=>chat.avatar_down(this);
-
-		this.avatar_frame = new PIXI.Sprite(assets.chat_avatar_frame_img);
-		this.avatar_frame.width=70;
-		this.avatar_frame.height=70;
-		this.avatar_frame.x=this.avatar.x-10;
-		this.avatar_frame.y=this.avatar.y-10;
+		this.avatar_frame = new PIXI.Sprite(assets.chat_avatar_frame_img)
+		this.avatar_frame.width=70
+		this.avatar_frame.height=70
+		this.avatar_frame.x=this.avatar.x-10
+		this.avatar_frame.y=this.avatar.y-10
 
 		this.name = new PIXI.BitmapText('Имя Фамил', {fontName: 'mfont32',fontSize: 17});
 		this.name.anchor.set(0,0.5);
@@ -762,8 +761,8 @@ class feedback_record_class extends PIXI.Container {
 	constructor() {
 
 		super();
-		this.text=new PIXI.BitmapText('Николай: хорошая игра', {lineSpacing:50,fontName: 'mfont32',fontSize: 20,align: 'left'});
-		this.text.maxWidth=290;
+		this.text=new PIXI.BitmapText('Николай: хорошая игра', {lineSpacing:25,fontName: 'mfont32',fontSize: 20,align: 'left'});
+		this.text.maxWidth=410;
 		this.text.tint=0xFFFF00;
 
 		this.name_text=new PIXI.BitmapText('Николай:', {fontName: 'mfont32',fontSize: 20,align: 'left'});
@@ -1560,7 +1559,7 @@ stickers={
 		if (!objects.stickers_cont.ready||objects.stickers_cont.visible||state!=='p') return;
 
 		//анимационное появление панели стикеров
-		anim3.add(objects.stickers_cont,{y:[450, objects.stickers_cont.sy,'easeOutBack']}, true, 0.5);
+		anim3.add(objects.stickers_cont,{alpha:[0, 1,'linear']}, true, 0.25)
 
 	},
 
@@ -1572,23 +1571,25 @@ stickers={
 			return;
 
 		//анимационное появление панели стикеров
-		anim3.add(objects.stickers_cont,{y:[objects.stickers_cont.sy, -450,'easeInBack']}, false, 0.5);
+		anim3.add(objects.stickers_cont,{alpha:[1, 0,'linear']}, false, 0.25)
 
 	},
 
 	async send(id) {
 
-		if (objects.stickers_cont.ready===false)
-			return;
+		if (!objects.stickers_cont.ready) return
 
-		if (this.promise_resolve_send!==0)
-			this.promise_resolve_send("forced");
+		if (this.promise_resolve_send!==0) this.promise_resolve_send("forced")
 
-		this.hide_panel();
-
-		fbs.ref('inbox/'+opp_data.uid).push({s:my_data.uid,m:'STCR',tm:Date.now(),data:id});
+		//воспроизводим соответствующий звук
+		sound.play('receive_sticker');
 		
-		sys_msg.add('Вы отправили стикер!')
+		this.hide_panel()
+
+		fbs.ref('inbox/'+opp_data.uid).push({s:my_data.uid,m:'STCR',tm:Date.now(),data:id})
+		
+		objects.sent_sticker_area.texture=assets['sticker_texture_'+id]
+		await anim3.add(objects.sent_sticker_area,{x:[50,objects.sent_sticker_area.sx,'easeOutBack'],y:[50,objects.sent_sticker_area.sy,'easeOutBack'],alpha:[0, 0.8,'linear']}, true, 0.5);
 
 		const res = await new Promise((resolve, reject) => {
 				stickers.promise_resolve_send = resolve;
@@ -1598,11 +1599,12 @@ stickers={
 
 		if (res === 'forced') return;
 
-		//anim3.add(objects.sent_sticker_area,{alpha:[0.8, 0,'linear']}, false, 0.5);
+		anim3.add(objects.sent_sticker_area,{alpha:[0.8, 0,'easeInBack']}, false, 0.5);
+		
+
 	},
 
 	async receive(id) {
-
 
 		if (this.promise_resolve_recive!==0)
 			this.promise_resolve_recive('forced');
@@ -1612,7 +1614,7 @@ stickers={
 
 		objects.rec_sticker_area.texture=assets['sticker_texture_'+id];
 
-		await anim3.add(objects.rec_sticker_area,{alpha:[0, 0.8,'linear']}, true, 0.5);
+		await anim3.add(objects.rec_sticker_area,{x:[400,objects.rec_sticker_area.sx,'easeOutBack'],y:[50,objects.rec_sticker_area.sy,'easeOutBack'],alpha:[0, 0.8,'linear']}, true, 0.5);
 
 		const res = await new Promise((resolve, reject) => {
 				stickers.promise_resolve_recive = resolve;
@@ -1723,7 +1725,7 @@ keyboard={
 		objects.chat_keyboard_text.text ='';
 		objects.chat_keyboard_control.text = `0/${this.MAX_SYMBOLS}`
 
-		anim3.add(objects.chat_keyboard_cont,{y:[450, objects.chat_keyboard_cont.sy,'linear']}, true, 0.2)
+		anim3.add(objects.chat_keyboard_cont,{y:[800, objects.chat_keyboard_cont.sy,'linear']}, true, 0.2)
 
 
 		return new Promise(resolve=>{
@@ -1856,7 +1858,7 @@ keyboard={
 
 		//на всякий случай уничтожаем резолвер
 		if (this.resolver) this.resolver(0);
-		anim3.add(objects.chat_keyboard_cont,{y:[objects.chat_keyboard_cont.y,450,'linear']}, false, 0.2);
+		anim3.add(objects.chat_keyboard_cont,{y:[objects.chat_keyboard_cont.y,800,'linear']}, false, 0.2);
 
 	},
 
@@ -2083,7 +2085,6 @@ timer={
 			return
 		}
 
-
 		clearInterval(this.t)
 		this.t=setInterval(()=>this.tick(),1000)
 		this.sec_left=sec
@@ -2133,7 +2134,7 @@ timer={
 	},
 
 	tick(){
-		return
+		//return
 		const tm=Date.now()
 		if (tm-this.prv_tm>5000||tm<this.prv_tm){
 			common.stop('timer_error');
@@ -2184,12 +2185,15 @@ pref={
 	tex_loading:0,
 	hours_to_nick_change:999,
 	hours_to_photo_change:999,
+	on:0,
 
 	activate(){
 
 		//пока ничего не изменено
-		this.avatar_changed=0;
-		this.name_changed=0;
+		this.avatar_changed=0
+		this.name_changed=0
+		
+		this.on=1
 
 		//заполняем имя и аватар
 		objects.pref_name.set2(my_data.name,260)
@@ -2564,7 +2568,7 @@ pref={
 		//убираем контейнер
 		anim3.add(objects.pref_cont,{x:[objects.pref_cont.x,-800,'linear']}, false, 0.4);
 		anim3.add(objects.pref_footer_cont,{y:[objects.pref_footer_cont.y,800,'linear']}, false, 0.4);
-
+		this.on=0
 	},
 
 	close_btn_down(button_data){
@@ -2579,12 +2583,12 @@ pref={
 
 	switch_to_lobby(){
 
-		this.close();
+		this.close()
 
 		//показываем лобби
-		anim3.add(objects.cards_cont,{x:[800,0,'linear']}, true, 0.4);
-		anim3.add(objects.lobby_header_cont,{y:[-200,objects.lobby_header_cont.sy,'linear']}, true, 0.4);
-		anim3.add(objects.lobby_footer_cont,{y:[800,objects.lobby_footer_cont.sy,'linear']}, true, 0.4);
+		anim3.add(objects.cards_cont,{x:[800,0,'linear']}, true, 0.4)
+		anim3.add(objects.lobby_header_cont,{y:[-200,objects.lobby_header_cont.sy,'linear']}, true, 0.4)
+		anim3.add(objects.lobby_footer_cont,{y:[800,objects.lobby_footer_cont.sy,'linear']}, true, 0.4)
 
 	},
 
@@ -2730,7 +2734,8 @@ big_msg = {
 		objects.big_msg_t2.text=params.t2||''
 		objects.big_msg_t3.text=params.t3||''
 
-		objects.big_msg_fb_btn.visible = (!my_data.blocked)&&params.fb&&my_data.games>=200
+		//objects.big_msg_fb_btn.visible = (!my_data.blocked)&&params.fb&&my_data.games>=200
+		objects.big_msg_fb_btn.visible=true
 
 		anim3.add(objects.big_msg_cont,{angle:[0,5,'ease2back'],alpha:[0, 1,'linear'],scale_xy:[1,1.1,'ease2back']}, true, 0.5)
 
@@ -2760,7 +2765,7 @@ big_msg = {
 
 	},
 
-	async feedback_down() {
+	async fb_btn_down() {
 
 		if (anim3.any_on()){
 			sound.play('locked');
@@ -4005,6 +4010,8 @@ online_game={
 		//если открыты другие окна то закрываем их
 		if (objects.chat_cont.visible) chat.close()
 		if (bot_game.on) bot_game.clear()
+		if (lb.on) lb.close()
+		if (pref.on) pref.close()
 
 		//устанавливаем локальный и удаленный статус
 		set_state({state:'p'})
@@ -4068,8 +4075,9 @@ online_game={
 
 		//если есть данные то отправляем из сопернику
 		if (msg){
-			fbs.ref('inbox/'+opp_data.uid).push({s:my_data.uid,m:'CHAT',tm:Date.now(),data:msg});
-			message.add({text:msg, timeout:3000,sound_name:'online_message',sender:'me'});
+			fbs.ref('inbox/'+opp_data.uid).push({s:my_data.uid,m:'CHAT',tm:Date.now(),data:msg})
+			objects.message_bcg.scale_x=0.666
+			message.add({text:msg, timeout:3000,sound_name:'online_message',sender:'me'})
 		}
 	},
 	
@@ -4132,6 +4140,7 @@ online_game={
 
 	chat(data) {
 
+		objects.message_bcg.scale_x=-0.666
 		message.add({text:data, timeout:10000,sound_name:'online_message',sender:'opp'});
 
 	},
@@ -4219,6 +4228,11 @@ bot_game={
 		opponent=this
 		my_turn=1
 		this.on=1
+		
+		//если открыты другие окна то закрываем их
+		if (objects.chat_cont.visible) chat.close()
+		if (lb.on) lb.close()
+		if (pref.on) pref.close()
 		
 		opponent=this
 		
@@ -4361,6 +4375,7 @@ bot_game={
 		casino.clear()
 		scheduler.stop_all()
 		sys_msg.close()
+		dice.stop()
 		
 	},
 
@@ -5379,6 +5394,13 @@ common={
 		
 		this.on=0
 		timer.stop()
+		
+		//убираем все окна
+		objects.roll_dice_btn.visible=false
+		objects.auc_cont.visible=false
+		objects.cell_info_cont.visible=false
+		objects.plans_cont.visible=false
+		objects.exch_cont.visible=false
 				
 		anim3.add(objects.game_btns_cont,{y:[objects.game_btns_cont.y,800,'linear']}, false, 0.3)				
 		await opponent.stop(res)
@@ -5432,7 +5454,7 @@ main_menu={
 		objects.main_menu_cont.visible=true;
 
 
-		objects.bcg.texture=assets.main_bcg;
+		
 		anim3.add(objects.bcg,{alpha:[0,1,'linear']}, true, 0.5);
 
 		anim3.add(objects.main_menu_cont,{alpha:[0,1,'linear']}, true, 0.5);
@@ -6170,7 +6192,7 @@ lobby={
 		//показыаем кнопку приглашения
 		objects.invite_button.texture=assets.invite_button;
 
-		anim3.add(objects.invite_cont,{x:[800, objects.invite_cont.sx,'linear']}, true, 0.15);
+		anim3.add(objects.invite_cont,{scale_xy:[0.5, 1,'easeOutBack'],alpha:[0,1,'linear']}, true, 0.15);
 
 		const card=objects.mini_cards[card_id];
 
@@ -6272,10 +6294,9 @@ lobby={
 
 
 		//получаем фидбэки сначала из кэша, если их там нет или они слишком старые то загружаем из фб
-		let fb_obj;
+		let fb_obj
 		if (!this.fb_cache[uid] || (Date.now()-this.fb_cache[uid].tm)>120000) {
-			let _fb = await fbs.ref("fb/" + uid).once('value');
-			fb_obj =_fb.val();
+			fb_obj =await fbs_once("fb/" + uid)
 
 			//сохраняем в кэше отзывов
 			this.fb_cache[uid]={};
@@ -6321,8 +6342,7 @@ lobby={
 			const fb_end=prv_fb_bottom+fb_height;
 
 			//если отзыв будет выходить за экран то больше ничего не отображаем
-			const fb_end_abs=fb_end+objects.invite_cont.y+objects.invite_feedback.y;
-			if (fb_end_abs>450) return;
+			if (fb_end>220) return;
 
 			fb_place.visible=true;
 			fb_place.y=prv_fb_bottom;
@@ -6402,7 +6422,8 @@ lobby={
 		
 		if (part===1){
 			objects.hand_instr.texture=assets.hand0		
-			await anim3.add(objects.hand_instr,{x:[800, 139,'easeOutCubic'],y:[450, 73,'easeOutCubic']}, true, 0.5)
+						
+			await anim3.add(objects.hand_instr,{x:[450, 73,'easeOutCubic'],y:[800, 100,'easeOutCubic']}, true, 0.5)
 			await new Promise(resolve => setTimeout(resolve, 250))
 			for (let i=0;i<3;i++){
 				objects.hand_instr.texture=assets.hand1
@@ -6413,13 +6434,11 @@ lobby={
 			anim3.add(objects.hand_instr,{alpha:[1, 0,'linear']}, false, 0.5)			
 			
 		}
-
-		
 		
 		if (part===2){
 			this.first_run=0
 			objects.hand_instr.texture=assets.hand0		
-			await anim3.add(objects.hand_instr,{x:[800, 610,'easeOutCubic'],y:[450, 180,'easeOutCubic']}, true, 0.5)
+			await anim3.add(objects.hand_instr,{x:[450, 203,'easeOutCubic'],y:[800, 322,'easeOutCubic']}, true, 0.5)
 			await new Promise(resolve => setTimeout(resolve, 250))
 			for (let i=0;i<3;i++){
 				objects.hand_instr.texture=assets.hand1
@@ -6467,7 +6486,7 @@ lobby={
 			pending_player='';
 		}
 
-		anim3.add(objects.invite_cont,{x:[objects.invite_cont.x, 800,'linear']}, false, 0.15);
+		anim3.add(objects.invite_cont,{scale_xy:[1, 0.5,'easeInBack'],alpha:[1,0,'linear']}, false, 0.3);
 	},
 
 	async send_invite() {
@@ -6612,12 +6631,13 @@ lobby={
 
 lb={
 
-	cards_pos: [[370,10],[380,70],[390,130],[380,190],[360,250],[330,310],[290,370]],
 	last_update:0,
-
+	on:0,
 	show() {
 
-		objects.bcg.texture=assets.lb_bcg;
+		this.on=1
+		
+		//objects.bcg.texture=assets.lb_bcg;
 		anim3.add(objects.bcg,{alpha:[0,1,'linear']}, true, 0.5);
 
 		anim3.add(objects.lb_1_cont,{x:[-150, objects.lb_1_cont.sx,'easeOutBack']}, true, 0.5);
@@ -6630,8 +6650,8 @@ lb={
 		anim3.add(objects.lb_back_btn,{y:[450, objects.lb_back_btn.sy,'linear']}, true, 0.25);
 
 		for (let i=0;i<7;i++) {
-			objects.lb_cards[i].x=this.cards_pos[i][0];
-			objects.lb_cards[i].y=this.cards_pos[i][1];
+			objects.lb_cards[i].x=40
+			objects.lb_cards[i].y=280+i*60
 			objects.lb_cards[i].place.text=(i+4)+".";
 
 		}
@@ -6645,13 +6665,15 @@ lb={
 	},
 
 	close() {
+		
+		this.on=0
 
 		//objects.bcg.texture=assets.bcg;
-		objects.lb_1_cont.visible=false;
-		objects.lb_2_cont.visible=false;
-		objects.lb_3_cont.visible=false;
-		objects.lb_cards_cont.visible=false;
-		objects.lb_back_btn.visible=false;
+		objects.lb_1_cont.visible=false
+		objects.lb_2_cont.visible=false
+		objects.lb_3_cont.visible=false
+		objects.lb_cards_cont.visible=false
+		objects.lb_back_btn.visible=false
 
 	},
 
@@ -6841,6 +6863,7 @@ main_loader={
 
 		//добавляем текстуры из листа загрузки
 		loader.add('load_bar_bcg', git_src+'res/'+'common/load_bar_bcg.png');
+		loader.add('main_bcg', git_src+'res/common/main_bcg.jpg');
 		loader.add('load_bar_progress', git_src+'res/'+'common/load_bar_progress.png');
 		loader.add('mfont2',git_src+'/fonts/core_sans_ds_32/font.fnt');
 		loader.add('main_load_list',git_src+'/load_list.txt');
@@ -6852,11 +6875,21 @@ main_loader={
 			assets[res_name]=res.texture||res.sound||res.data;
 		}
 
+		//главный бэкграунд
+		objects.bcg=new PIXI.Sprite(assets.main_bcg)
+		objects.bcg.width=470
+		objects.bcg.height=820
+		objects.bcg.x=-10
+		objects.bcg.y=-10
+		app.stage.addChild(objects.bcg)
+		
 		const load_bar_bcg=new PIXI.Sprite(assets.load_bar_bcg);
 		load_bar_bcg.x=0;
 		load_bar_bcg.y=390;
 		load_bar_bcg.width=450;
 		load_bar_bcg.height=70;
+		
+		
 
 		this.load_bar_mask=new PIXI.Graphics();
 		this.load_bar_mask.beginFill(0xff0000);
@@ -6903,7 +6936,7 @@ main_loader={
 		const loader=new PIXI.Loader();
 
 		//добавляем текстуры стикеров
-		for (var i=0;i<12;i++)
+		for (var i=0;i<15;i++)
 			loader.add('sticker_texture_'+i, git_src+'stickers/'+i+'.png');
 
 		//добавляем из основного листа загрузки
@@ -6981,7 +7014,7 @@ main_loader={
 		script.textContent = assets.multiavatar;
 		document.head.appendChild(script);
 
-		await anim3.add(objects.load_cont,{alpha:[1,0,'linear'],scale_xy:[1,3,'linear'],angle:[0,-30,'linear']}, false, 0.25);
+		await anim3.add(objects.load_cont,{alpha:[1,0,'linear']}, false, 0.25);
 
 
 
@@ -7243,8 +7276,8 @@ async function init_game_env(lang) {
 	main_loop();
 
 
-	await main_loader.load1();
-	await main_loader.load2();
+	await main_loader.load1()
+	await main_loader.load2()
 
 	anim3.add(objects.id_cont,{alpha:[0,1,'linear'],y:[-200,objects.id_cont.sy,'easeOutBack']}, true,0.5);
 	some_process.loup_anim=()=>{objects.id_gear.rotation+=0.02}
