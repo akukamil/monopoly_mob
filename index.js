@@ -3947,10 +3947,16 @@ plans={
 			this.action_made=1
 			return
 		}
+		
+		if (my_data.money<50){
+			sys_msg.add('Недостаточно денег для улучшения!')
+			sound.play('decline')
+			return
+		}
 
 		sound.play('plans_click')
 		this.action_made=1
-
+		common.change_money(1,-50)
 		this.plans_progress[i]+=25
 		this.plans_progress[i]=Math.min(this.plans_progress[i],100)
 		
@@ -4547,7 +4553,7 @@ bot_game={
 
 		//цели
 		if (cell.type==='?'){
-
+			
 			if (this.plans_progress[0]>=100){
 				const empty_cities=common.get_empty_cities(1)
 				
@@ -4562,7 +4568,14 @@ bot_game={
 					game_msgs.add('Соперник не смог реализовать план Захват!')
 				}
 			}else{
-				this.plans_progress[0]+=25
+				if (opp_data.money>50){
+					this.plans_progress[0]+=25
+					common.change_money(2,-50)
+				}else{
+					game_msgs.add('Соперник получил 100$')
+					common.change_money(2,100)
+				}
+
 			}
 
 			scheduler.add(()=>{this.try_upgrade_some_city()},1000)
@@ -5159,8 +5172,11 @@ common={
 	opp_activated_plan(data){
 		//активация плана
 
-		if (data.id===-1)
+		if (data.id===-1){
+			this.change_money(2,-50)
 			game_msgs.add('Соперник доработал план!')
+		}
+
 		
 		if (data.id===0){
 
@@ -6885,7 +6901,7 @@ main_loader={
 		
 		const load_bar_bcg=new PIXI.Sprite(assets.load_bar_bcg);
 		load_bar_bcg.x=0;
-		load_bar_bcg.y=390;
+		load_bar_bcg.y=360;
 		load_bar_bcg.width=450;
 		load_bar_bcg.height=70;
 		
@@ -6895,23 +6911,23 @@ main_loader={
 		this.load_bar_mask.beginFill(0xff0000);
 		this.load_bar_mask.drawRect(0,0,1,40);
 		this.load_bar_mask.x=0;
-		this.load_bar_mask.y=420;
+		this.load_bar_mask.y=380;
 
 		const load_bar_progress=new PIXI.Sprite(assets.load_bar_progress);
 		load_bar_progress.x=0;
-		load_bar_progress.y=420;
+		load_bar_progress.y=390;
 		load_bar_progress.width=450;
 		load_bar_progress.height=40;
 		load_bar_progress.mask=this.load_bar_mask
 
-		this.t_progress=new PIXI.BitmapText('', {fontName: 'mfont32',fontSize: 18,align: 'center'});
-		this.t_progress.y=225;
-		this.t_progress.x=600;
-		this.t_progress.tint=0xffffff;
-		this.t_progress.anchor.set(1,0);
+		this.t_progress=new PIXI.BitmapText('', {fontName: 'mfont32',fontSize: 18,align: 'center'})
+		this.t_progress.y=420
+		this.t_progress.x=430
+		this.t_progress.tint=0xffffff
+		this.t_progress.anchor.set(1,0)
 
 		this.t_info=new PIXI.BitmapText(['Загрузка...','Loading...'][LANG], {fontName: 'mfont32',fontSize: 20,align: 'center'});
-		this.t_info.y=460
+		this.t_info.y=385
 		this.t_info.x=225
 		this.t_info.tint=0xffffff
 		this.t_info.anchor.set(0.5,0.5)
