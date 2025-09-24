@@ -6990,6 +6990,7 @@ main_loader={
 		loader.add('exch_select',git_src+'sounds/exch_select.mp3')
 		loader.add('clock',git_src+'sounds/clock.mp3')
 		loader.add('music',git_src+'sounds/music2.mp3')
+		loader.add('confirm_dialog',git_src+'sounds/confirm_dialog.mp3')
 
 		//прогресс
 		loader.onProgress.add((l,res)=>{
