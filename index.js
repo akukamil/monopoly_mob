@@ -1817,7 +1817,7 @@ keyboard={
 		let key=key_data[4];
 
 		//звук нажатой клавиши
-		sound.play('keypress');
+		sound.play('keypress')
 
 		const t=objects.chat_keyboard_text.text;
 		if ((key==='ОТПРАВИТЬ'||key==='SEND')&&t.length>0){
@@ -7007,6 +7007,7 @@ main_loader={
 		loader.add('clock',git_src+'sounds/clock.mp3')
 		loader.add('music',git_src+'sounds/music2.mp3')
 		loader.add('confirm_dialog',git_src+'sounds/confirm_dialog.mp3')
+		loader.add('keypress',git_src+'sounds/keypress.mp3')
 
 		//прогресс
 		loader.onProgress.add((l,res)=>{
