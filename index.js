@@ -3701,12 +3701,13 @@ exch={
 			return
 		}
 
-		if (cell.level>1){
-			objects.exch_info.text='нужно выбрать город без зданий'
+		const country=cells_data.filter(d=>d.country===cell.country)
+		const max_level=Math.max(...country.map(c=>c.level))
+		if (max_level>1){
+			objects.exch_info.text='Эта страна уже застроена'
 			sound.play('decline')
 			return
 		}
-		
 		
 		sound.play('exch_select')
 
@@ -3847,7 +3848,8 @@ exch={
 
 		this.on=0
 		anim3.add(objects.exch_cont,{alpha:[1, 0,'linear'],scale_xy:[1,0.8,'easeInBack']}, false, 0.2)
-		common.show_done_btn()
+		if (this.state==='my_offer')
+			common.show_done_btn()
 	}
 
 
@@ -4237,7 +4239,6 @@ bot_game={
 		
 		//если открыты другие окна то закрываем их
 		if (objects.chat_cont.visible) chat.close()
-		if (lb.on) lb.close()
 		if (pref.on) pref.close()
 		
 		opponent=this
@@ -4253,65 +4254,6 @@ bot_game={
 		
 		objects.timer_text.text='!!!'
 		
-		
-		
-		for (let i=0;i<24;i++){
-
-			const cell_obj=objects.cells[i]
-			const cell=cells_data[i]
-
-			if ([0,7,12,19].includes(i)){
-				cell_obj.bcg.texture=assets.big_cell_bcg
-				cell_obj.bcg.width=83
-				cell_obj.bcg.height=83
-			}else{
-				cell_obj.bcg.texture=assets.cell_bcg
-				cell_obj.bcg.width=74
-				cell_obj.bcg.height=74
-			}
-
-			if (cell.type==='city'){
-				cell_obj.price.text=cell.price+'$'
-				cell_obj.interactive=true
-				cell_obj.buttonMode=true
-				cell_obj.pointerdown=function(){common.cell_down(i)}
-				cell_obj.auc_icon.visible=cell.auc?true:false
-				cell_obj.city_name.text=cell.rus_name
-			}
-
-			if (cell.type==='casino'){
-				cell_obj.bcg.texture=assets.big_cell_casino_bcg
-				cell_obj.price.visible=false
-				cell_obj.city_name.visible=false
-				cell_obj.interactive=false
-				cell_obj.buttonMode=false
-				cell_obj.auc_icon.visible=false
-				cell_obj.icon.visible=false
-
-			}
-
-			if (cell.type==='start'){
-				cell_obj.bcg.texture=assets.big_cell_start_bcg
-				cell_obj.price.visible=false
-				cell_obj.city_name.visible=false
-				cell_obj.interactive=false
-				cell_obj.buttonMode=false
-				cell_obj.auc_icon.visible=false
-				cell_obj.icon.visible=false
-
-			}
-
-			if (cell.type==='?'){
-				cell_obj.price.visible=false
-				cell_obj.city_name.visible=false
-				cell_obj.interactive=false
-				cell_obj.buttonMode=false
-				cell_obj.auc_icon.visible=false
-				cell_obj.icon.visible=true
-			}
-
-		}
-
 		common.activate()
 		
 		game_msgs.add('Игра против бота началась, ваш ход...')
@@ -4329,8 +4271,6 @@ bot_game={
 					auc.opp_bid({type:'auc_dec2'})
 			},1000)
 		}
-
-
 
 		//торговля
 		if (data.type==='auc_bid'){
@@ -4373,6 +4313,7 @@ bot_game={
 	},
 
 	clear(){		
+
 		
 		objects.auc_cont.visible=false
 		objects.cell_info_cont.visible=false
@@ -4447,7 +4388,7 @@ bot_game={
 
 	},
 
-	stop_btn_down(){
+	exit_btn_down(){
 		
 		if (anim3.any_on()) {
 			sound.play('decline')
@@ -4569,6 +4510,7 @@ bot_game={
 				}
 			}else{
 				if (opp_data.money>50){
+					game_msgs.add('Соперник доработал план')
 					this.plans_progress[0]+=25
 					common.change_money(2,-50)
 				}else{
@@ -4607,7 +4549,7 @@ bot_game={
 				common.remove_empty_city(empty_city)
 				city_id=empty_city.id
 				sound.play('city_lost')
-				game_msgs.add('Соперник в казино проиграр город '+empty_city?.rus_name)
+				game_msgs.add('Соперник проиграл город '+empty_city?.rus_name)
 			}else{
 				game_msgs.add('Соперник чуть не потерял город в казино')	
 			}
@@ -4715,7 +4657,13 @@ common={
 		objects.opp_card_name.set2(opp_data.name,160);
 		objects.opp_card_rating.text=opp_data.rating;
 		objects.opp_avatar.texture=players_cache.players[opp_data.uid].texture;
+		
+		this.prepare_cells()
 
+	},
+	
+	prepare_cells(){
+		
 		for (let i=0;i<24;i++){
 
 			const cell_obj=objects.cells[i]
@@ -4778,6 +4726,7 @@ common={
 
 		}
 
+		
 	},
 
 	cell_down(id){
@@ -5519,27 +5468,6 @@ main_menu={
 
 	},
 
-	ball_touched(ball,D){
-
-		if (anim3.any_on()) {
-			sound.play('locked');
-			return
-		};
-
-		const curx=ball.x;
-		const cur_rot=ball.rotation;
-
-		let tar_x=0;
-		let tar_rot=0;
-
-		if (curx>400){
-			ball.spd=-irnd(1,7);
-		}else{
-			ball.spd=irnd(1,7);;
-		}
-
-	},
-
 	async close() {
 
 		//игровой титл
@@ -5556,27 +5484,6 @@ main_menu={
 		//vk
 		//if(objects.vk_buttons_cont.visible)
 		//	anim3.add(objects.vk_buttons_cont,{alpha:[1,0,'linear']}, false, 0.25);
-
-	},
-
-	async sp_btn_down () {
-
-		if (anim3.any_on()) {
-			sound.play('locked');
-			return
-		};
-
-		sound.play('click')
-
-		await this.close()
-
-
-
-		opp_data.uid='bot';
-		opp_data.name=['Бот','Bot'][LANG];
-		opp_data.rating=1400;
-
-		bot_game.activate()
 
 	},
 
@@ -5641,19 +5548,6 @@ main_menu={
 		
 	},
 	
-	rules_ok_down () {
-
-		if (anim3.any_on()===true) {
-			sound.play('locked');
-			return
-		};
-
-		sound.play('close_it');
-
-		anim3.add(objects.rules,{y:[objects.rules.sy, -450,'easeInBack']}, false, 0.5);
-
-	},
-
 
 }
 
