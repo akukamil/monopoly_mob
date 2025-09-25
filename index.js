@@ -6396,7 +6396,7 @@ lobby={
 			pending_player='';
 		}
 
-		anim3.add(objects.invite_cont,{scale_xy:[1, 0.5,'easeInBack'],alpha:[1,0,'linear']}, false, 0.3);
+		anim3.add(objects.invite_cont,{scale_xy:[1, 0.5,'easeInBack'],alpha:[1,0,'linear']}, false, 0.2);
 	},
 
 	async send_invite() {
