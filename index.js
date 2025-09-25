@@ -3618,9 +3618,8 @@ exch={
 
 		this.state='opp_offer'
 
-
+		sound.play('exch_req')
 		objects.exch_get_price.text='Соперник предлагает обмен...'
-
 
 		objects.exch_btn1.texture=assets.exch_decline_btn_img
 		objects.exch_btn2.texture=assets.exch_approve_btn_img
@@ -4781,6 +4780,7 @@ common={
 			return
 		}
 
+		sound.play('click')
 
 		const tm=Date.now()
 		if (tm-exch.last_offer_tm<60000){
@@ -6898,6 +6898,7 @@ main_loader={
 		loader.add('exch_accepted',git_src+'sounds/exch_accepted.mp3')
 		loader.add('exch_decline',git_src+'sounds/exch_decline.mp3')
 		loader.add('exch_select',git_src+'sounds/exch_select.mp3')
+		loader.add('exch_req',git_src+'sounds/exch_req.mp3')
 		loader.add('clock',git_src+'sounds/clock.mp3')
 		loader.add('music',git_src+'sounds/music2.mp3')
 		loader.add('confirm_dialog',git_src+'sounds/confirm_dialog.mp3')
