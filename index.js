@@ -849,7 +849,7 @@ req_dialog={
 
 		sound.play('receive_sticker');
 
-		anim3.add(objects.req_cont,{y:[-260, objects.req_cont.sy,'easeOutElastic']}, true, 0.75);
+		anim3.add(objects.req_cont,{scale_xy:[0.5, 1,'easeOutBack'],alpha:[0,1,'linear']}, true, 0.25);
 
 		//Отображаем  имя и фамилию в окне приглашения
 		req_dialog._opp_data.uid=uid;
@@ -6290,7 +6290,7 @@ lobby={
 	},
 
 	async inst_message(data){
-
+		return
 		//когда ничего не видно не принимаем сообщения
 		if(!objects.cards_cont.visible) return;
 
