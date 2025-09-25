@@ -6929,16 +6929,6 @@ main_loader={
 
 		await anim3.add(objects.load_cont,{alpha:[1,0,'linear']}, false, 0.25);
 
-
-
-		objects.bcg=new PIXI.Sprite();
-		objects.bcg.x=-10;
-		objects.bcg.y=-10;
-		objects.bcg.width=M_WIDTH+20;
-		objects.bcg.height=M_HEIGHT+20;
-		app.stage.addChild(objects.bcg);
-
-
 		//создаем спрайты и массивы спрайтов и запускаем первую часть кода
 		const main_load_list=eval(assets.main_load_list);
 		for (var i = 0; i < main_load_list.length; i++) {
