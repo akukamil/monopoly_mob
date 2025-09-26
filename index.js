@@ -7286,7 +7286,7 @@ async function init_game_env(lang) {
 	setTimeout(function(){anim3.add(objects.id_cont,{y:[objects.id_cont.sy, -300,'linear'],x:[objects.id_cont.sx,1200,'linear'],angle:[0,200,'linear']}, false, 0.4)},500);
 
 	//это разные события
-	//document.addEventListener("visibilitychange", function(){tabvis.change()});
+	document.addEventListener("visibilitychange", function(){tabvis.change()});
 	window.addEventListener('wheel', (event) => {
 		//lobby.wheel_event(Math.sign(event.deltaY));
 		chat.wheel_event(Math.sign(event.deltaY));
