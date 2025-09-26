@@ -3137,7 +3137,7 @@ auc={
 		this.started=0
 
 		anim3.add(objects.auc_cont,{alpha:[0, 1,'linear'],scale_xy:[1,1.1,'ease2back']}, true, 0.2)
-		objects.auc_make_bid_btn.texture=assets.auc_make_bid_btn
+		//objects.auc_make_bid_btn.texture=assets.auc_make_bid_btn
 
 		this.new_bid=this.cur_bid=cell.price
 		this.cur_cell=cell
