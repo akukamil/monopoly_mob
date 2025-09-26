@@ -3495,7 +3495,7 @@ casino={
 		}
 		if (result===5){
 			game_msgs.add('Вы не платите ренту 3 хода!')
-			sound.play('can_buy_any_city')
+			sound.play('norent')
 			common.my_no_rent_bonus=3
 		}
 		opponent.send({s:my_data.uid,type:'casino_result',result,city_id,tm:Date.now()})
@@ -4581,6 +4581,7 @@ bot_game={
 		}
 		if (result===5){
 			common.opp_no_rent_bonus=3
+			sound.play('norent')
 			game_msgs.add('Соперник не платит ренту 3 хода!')
 		}
 		
