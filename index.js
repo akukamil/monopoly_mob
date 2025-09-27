@@ -4643,6 +4643,7 @@ bot_game={
 			sound.play('norent')
 			game_msgs.add('Соперник не платит ренту 3 хода!')
 		}
+	}
 		
 }
 
