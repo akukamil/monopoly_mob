@@ -5329,52 +5329,51 @@ common={
 		//анимация
 		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.2,'ease2back']}, true, 0.6)
 	},
+	
 	buy(player,cell,prc){
 
-		if (cell.type==='city'){
 
-			const price=prc||(cell.level>0?cell.house_cost:cell.price)
-			cell.owner=player
-			this.change_money(player,-price)
-			
-			cell.level++
-			
-			this.casino_buy_bonus=0
-			
-			//анимация
-			anim3.add(objects.cells[cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
-			
-			//проверяем монополию для звука и подстветки всей монополии
-			this.check_monopoly_and_flash(cell)
+		if (cell.type!=='city') return
+
+		const price=prc||(cell.level>0?cell.house_cost:cell.price)
+		cell.owner=player
+		this.change_money(player,-price)
 		
-			//куплен дом
-			if (cell.level>1&&cell.level<6){
-				this.houses_num--
-				objects.houses_info.text='Домов в банке: '+this.houses_num
-			}
+		cell.level++
+		
+		this.buy_any_city_bonus=0
+		
+		//анимация
+		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
+		
+		//проверяем монополию для звука и подстветки всей монополии
+		this.check_monopoly_and_flash(cell)		
+	
+		//куплен дом
+		if (cell.level>1&&cell.level<6){
+			this.houses_num--
+			objects.houses_info.text='Домов в банке: '+this.houses_num
+		}
 
-			//куплен отель, 4 дома вернули в банк
-			if (cell.level===6){
-				this.houses_num+=4
-				objects.houses_info.text='Домов в банке: '+this.houses_num
-				sound.play('hotel_buy')
-			}else{
-				sound.play('buy')
-			}
+		//куплен отель, 4 дома вернули в банк
+		if (cell.level===6){
+			this.houses_num+=4
+			objects.houses_info.text='Домов в банке: '+this.houses_num
+			sound.play('hotel_buy')
+		}else{
+			sound.play('buy')
+		}
 
-			//обновляем всю страну так как там тоже могло поменяться
-			//this.update_country(cell)
-			this.update_view(cell)
+		//обновляем всю страну так как там тоже могло поменяться
+		//this.update_country(cell)
+		this.update_view(cell)
 
-			//если не от аукциона
-			if(!prc){
-				if (player===2)
-					game_msgs.add('Соперник купил '+['','город','дом','дом','дом','дом','отель'][cell.level] +' ('+ cell.rus_name +')')
-				else
-					game_msgs.add('Вы купили '+['','город','дом','дом','дом','дом','отель'][cell.level] +' ('+ cell.rus_name +')')
-			}
-
-
+		//если не от аукциона
+		if(!prc){
+			if (player===2)
+				game_msgs.add('Соперник купил '+['','город','дом','дом','дом','дом','отель'][cell.level] +' ('+ cell.rus_name +')')
+			else
+				game_msgs.add('Вы купили '+['','город','дом','дом','дом','дом','отель'][cell.level] +' ('+ cell.rus_name +')')
 		}
 
 	},
