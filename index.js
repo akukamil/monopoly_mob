@@ -2964,7 +2964,7 @@ city_dlg={
 			
 			btn2.visible=true
 			btn2_t.visible=true
-			btn2_t.text=`ВЫКУПИТЬ ГОРОД\n-$${cell.price}`
+			btn2_t.text=`ВЫКУПИТЬ\n-$${cell.price}`
 			btn2.pointerdown=function(){city_dlg.rebuy_btn_down()}
 		 
 		}
@@ -3029,7 +3029,6 @@ city_dlg={
 		this.update(cell)
 		sound.play('city_dlg')
 	},
-
 
 	buy_btn_down(){
 
