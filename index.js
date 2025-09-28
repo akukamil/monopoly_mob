@@ -5112,6 +5112,8 @@ common={
 
 		if (move_data.type==='casino_accept'){
 			sys_msg.add('Соперник играет в казино...')
+			if(move_data.pay_to_play)
+				common.change_money(2,-250)
 		}
 
 		if (move_data.type==='casino_decline'){
