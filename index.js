@@ -705,8 +705,8 @@ class player_mini_card_class extends PIXI.Container {
 
 		//аватар первого игрока
 		this.avatar1=new PIXI.Graphics();
-		this.avatar1.x=19;
-		this.avatar1.y=16;
+		this.avatar1.x=17;
+		this.avatar1.y=28;
 		this.avatar1.w=this.avatar1.h=58.2;
 
 		this.avatar1_frame=new PIXI.Sprite(assets.chat_avatar_frame_img);
@@ -717,8 +717,8 @@ class player_mini_card_class extends PIXI.Container {
 
 		//аватар второго игрока
 		this.avatar2=new PIXI.Graphics();
-		this.avatar2.x=121;
-		this.avatar2.y=16;
+		this.avatar2.x=84;
+		this.avatar2.y=28;
 		this.avatar2.w=this.avatar2.h=58.2;
 
 		this.avatar2_frame=new PIXI.Sprite(assets.chat_avatar_frame_img)
@@ -730,13 +730,13 @@ class player_mini_card_class extends PIXI.Container {
 		this.rating_text1.tint=0xffff00
 		this.rating_text1.anchor.set(0.5,0)
 		this.rating_text1.x=48.1
-		this.rating_text1.y=56
+		this.rating_text1.y=92
 
 		this.rating_text2=new PIXI.BitmapText('', {fontName: 'mfont32',fontSize: 24,align: 'center'})
 		this.rating_text2.tint=0xffff00
 		this.rating_text2.anchor.set(0.5,0)
-		this.rating_text2.x=150.1
-		this.rating_text2.y=56
+		this.rating_text2.x=115
+		this.rating_text2.y=92
 
 		this.t_country=new PIXI.BitmapText('', {fontName: 'mfont32',fontSize: 25,align: 'center'})
 		this.t_country.tint=0xffff00
