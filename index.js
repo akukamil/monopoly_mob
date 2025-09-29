@@ -3327,7 +3327,6 @@ auc={
 		const mx=e.data.global.x/app.stage.scale.x
 		const my=e.data.global.y/app.stage.scale.y
 
-
 		if (mx>105&&mx<170&&my>380&&my<440){
 			this.change_bid(-1)
 		}
@@ -3445,6 +3444,13 @@ auc={
 
 		//соперник сразу отказался, мы купили
 		if (this.state==='on_auc_dec'){
+			
+			if (this.cur_bid>my_data.money){
+				objects.auc_info.text='У Вас недостаточно денег!'
+				anim3.add(objects.auc_info,{x:[objects.auc_info.x, objects.auc_info.x+10,'shake']}, true, 0.15);
+				return
+			}
+			
 			this.state=''
 			game_msgs.add('Вы купили с аукциона') //это когда соперник отказался от аукциона
 			common.buy(1,this.cur_cell)
@@ -4628,8 +4634,7 @@ bot_game={
 			
 			const free_cities=cells_data.filter(c=>c.owner===0)
 			for (let city of free_cities){
-				if (city.price<opp_data.money){
-					
+				if (city.price<opp_data.money){					
 					common.buy(2,city)
 					game_msgs.add('Соперник купил город по акции: '+city.rus_name)
 					return				
