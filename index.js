@@ -3149,7 +3149,7 @@ fin={
 		
 		if (!common.on) return
 
-		if (my_data.money<=0){
+		if (my_data.money<0){
 			sound.play('decline')
 			sys_msg.add('Восстановите положительный баланс! Продайте часть активов.')
 			return
