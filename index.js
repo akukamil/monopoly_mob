@@ -4679,6 +4679,7 @@ common={
 		anim3.add(objects.game_btns_cont,{y:[800,objects.game_btns_cont.sy,'linear']}, true, 0.3)
 
 		//objects.bcg.texture=assets.lobby_bcg
+		plans.plans_progress=[0,0,0]		
 		
 		//бонусы не платить ренту
 		this.my_no_rent_bonus=0
