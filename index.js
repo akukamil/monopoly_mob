@@ -3155,14 +3155,10 @@ fin={
 			return
 		}
 
-
 		sound.play('click')
 
 		//отправляем сопернику
 		opponent.send({s:my_data.uid,type:'fin',tm:Date.now()})
-
-
-
 
 		//теперь уже не мой ход
 		my_turn_started=0
@@ -6252,7 +6248,7 @@ lobby={
 		//показыаем кнопку приглашения
 		objects.invite_button.texture=assets.invite_button;
 
-		anim3.add(objects.invite_cont,{x:[800, objects.invite_cont.sx,'linear']}, true, 0.15);
+		anim3.add(objects.invite_cont,{scale_xy:[0.5, 1,'easeOutBack'],alpha:[0,1,'linear']}, true, 0.15);
 
 		let player_data={uid};
 		//await this.update_players_cache_data(uid);
