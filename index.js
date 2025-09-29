@@ -2500,7 +2500,7 @@ pref={
 	},
 
 	init_music(){
-		const is_on=safe_ls('monopoly_music')??1
+		const is_on=safe_ls('monopoly_music')??0
 		if (is_on) music.start()
 		this.music_set_switch(music.on)
 	},
