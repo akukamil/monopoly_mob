@@ -4310,7 +4310,9 @@ bot_game={
 		common.activate()
 		
 		game_msgs.add('Игра против бота началась, ваш ход...')
-
+		
+		//устанавливаем локальный и удаленный статус
+		set_state ({state : 'b'})
 	},
 
 	send(data){
@@ -5956,10 +5958,6 @@ lobby={
 			break;
 
 			case 'p':
-				return assets.mini_player_card;
-			break;
-
-			case 'b':
 				return assets.mini_player_card;
 			break;
 
