@@ -2639,7 +2639,7 @@ dice={
 		}else{
 
 			//выбираем более интересные значения
-			/*for (let i=0;i<5;i++){
+			for (let i=0;i<3;i++){
 
 				this.rnd1=irnd(1,6)
 				this.rnd2=irnd(1,6)
@@ -2651,7 +2651,7 @@ dice={
 				if (next_cell.owner!==player)
 					break
 
-			}*/
+			}
 
 		}
 
