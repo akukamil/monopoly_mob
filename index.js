@@ -5259,6 +5259,20 @@ common={
 		
 	},
 	
+	capture_empty_city(cell){
+		
+		//меняем владельца горда
+		sound.play('capture_city')
+		cell.owner=3-cell.owner
+		this.update_view(cell)		
+		
+		//проверяем монополию для звука и подстветки всей монополии
+		this.check_monopoly_and_flash(cell)
+	
+		//анимация
+		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.2,'ease2back']}, true, 0.6)
+	},
+	
 	change_money(player,amount){
 
 		sound.play('money')
