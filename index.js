@@ -1370,12 +1370,14 @@ process_new_message = function(msg) {
 			if (msg.m==='END')
 				common.stop('opp_giveup');
 			
-			if (['auc_bid','auc_buy','auc_dec','auc_dec2','auc_giveup'].includes(msg.type))
-				auc.opp_bid(msg);
+
 
 			if (['exch','plan','exch_decline','exch_approve','buy','sell','rebuy','fin','roll','casino_accept','casino_decline','casino_result'].includes(msg.type))
 				common.process_opp_move(msg);
 
+			if (['auc_bid','auc_buy','auc_dec','auc_dec2','auc_giveup'].includes(msg.type))
+				auc.opp_bid(msg)
+			
 			//получение сообщение с ходом игорка
 			if (msg.m==='CHAT')
 				online_game.chat(msg.data);
@@ -3236,6 +3238,14 @@ auc={
 
 	opp_bid(data){
 		
+		//ждем завершения прежде чем обрабатывать ход
+		if (common.move_on||dice.roll_on){
+			//console.log('в очереди opp_bid ',data)
+			setTimeout(()=>{this.opp_bid(data)},250)
+			return;
+		}
+		
+		//console.log(data)
 		objects.auc_decline_btn.alpha=1
 		objects.auc_make_bid_btn.alpha=1
 
@@ -5120,12 +5130,13 @@ common={
 
 	process_opp_move(move_data){
 		
+		//console.log(move_data)
 		//ход получен значит соперник подтвердил
 		opponent.opp_conf_play=1
 		
 		//ждем завершения прежде чем обрабатывать ход
 		if (this.move_on||dice.roll_on){
-			console.log('в очереди ',move_data)
+			//console.log('в очереди ',move_data)
 			setTimeout(()=>{this.process_opp_move(move_data)},250)
 			return;
 		}
