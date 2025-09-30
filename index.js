@@ -4246,6 +4246,7 @@ online_game={
 			['my_giveup',LOSE , ['Вы банкрот!','You lose!']],
 			['opp_giveup',WIN , ['Соперник банкрот!','You win!']],
 			['timer_error',LOSE , ['Ошибка таймера!','Timer error!']],
+			['my_no_connection',LOSE , ['Потеря связи!','Connection error!']],
 			['opp_win',WIN , ['Вы банкрот!','You lose!']],
 			['draw',DRAW , ['Ничья!','You lose!']],
 			['my_stop',DRAW , ['Вы отменили игру.','You canceled the game']]
