@@ -4258,7 +4258,15 @@ online_game={
 		
 		const old_rating = my_data.rating
 		my_data.rating = this.calc_new_rating(my_data.rating, result_number)
+		
+		//записываем рейтинг в базу
+		fbs.ref('players/'+my_data.uid+'/rating').set(my_data.rating)
 
+		//увеличиваем количество игр
+		my_data.games++;
+		fbs.ref('players/'+my_data.uid+'/games').set(my_data.games)
+
+	
 		await big_msg.show({t1:['Игра завершена','Game over'][LANG],t2:result_info, t3:`${old_rating} > ${my_data.rating}`, fb:true})
 		
 		objects.auc_cont.visible=false
