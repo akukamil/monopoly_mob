@@ -871,7 +871,7 @@ req_dialog={
 
 		sound.play('close_it');
 
-		anim3.add(objects.req_cont,{y:[objects.req_cont.sy, -260,'easeInBack']}, false, 0.5);
+		anim3.add(objects.req_cont,{alpha:[1, 0,'linear'],scale_xy:[1,0,'easeInBack']}, false, 0.5);
 
 		fbs.ref('inbox/'+req_dialog._opp_data.uid).push({s:my_data.uid,m:"REJECT",tm:Date.now()});
 	},
@@ -886,8 +886,7 @@ req_dialog={
 		//устанавливаем окончательные данные оппонента
 		opp_data = req_dialog._opp_data;
 
-		anim3.add(objects.req_cont,{y:[objects.req_cont.sy, -260,'easeInBack']}, false, 0.5);
-
+		anim3.add(objects.req_cont,{alpha:[1, 0,'linear'],scale_xy:[1,0,'easeInBack']}, false, 0.5);
 
 		//отправляем информацию о согласии играть с идентификатором игры и сидом
 		game_id=irnd(1,9999);
@@ -904,9 +903,9 @@ req_dialog={
 
 		//если диалог не открыт то ничего не делаем
 		if (objects.req_cont.ready === false || objects.req_cont.visible === false)
-			return;
-
-		anim3.add(objects.req_cont,{y:[objects.req_cont.sy, -260,'easeInBack']}, false, 0.5);
+			return
+		
+		anim3.add(objects.req_cont,{alpha:[1, 0,'linear'],scale_xy:[1,0,'easeInBack']}, false, 0.5);
 
 	}
 
