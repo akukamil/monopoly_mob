@@ -542,36 +542,36 @@ class chat_record_class extends PIXI.Container {
 	}
 
 	nameToColor(name) {
-		  // Create a hash from the name
-		  let hash = 0;
-		  for (let i = 0; i < name.length; i++) {
-			hash = name.charCodeAt(i) + ((hash << 5) - hash);
-			hash = hash & hash; // Convert to 32bit integer
-		  }
+		
+		let hash = 0
+		for (let i = 0; i < name.length; i++) {
+			const char = name.charCodeAt(i);
+			hash = ((hash << 5) - hash) + char
+			hash = hash & hash
+		}
+		hash=Math.abs(hash)
 
-		  // Generate a color from the hash
-		  let color = ((hash >> 24) & 0xFF).toString(16) +
-					  ((hash >> 16) & 0xFF).toString(16) +
-					  ((hash >> 8) & 0xFF).toString(16) +
-					  (hash & 0xFF).toString(16);
+		const colors=[
+			0x262626,
+			0xFFFF00,
+			0xA9D08E,
+			0xA5B56B,
+			0xCCFF66,
+			0x00CC99,
+			0x002060,
+			0xFF9900,
+			0xFFFFFF,
+			0x404040,
+			0x33CC33,
+			0xFFCCFF,
+			0x0000FF,
+			0xC6E0B4,
+			0x0054A8,
+			0xC6E0B4
+		]		
 
-		  // Ensure the color is 6 characters long
-		  color = ('000000' + color).slice(-6);
+		return colors[hash%colors.length]
 
-		  // Convert the hex color to an RGB value
-		  let r = parseInt(color.slice(0, 2), 16);
-		  let g = parseInt(color.slice(2, 4), 16);
-		  let b = parseInt(color.slice(4, 6), 16);
-
-		  // Ensure the color is bright enough for a black background
-		  // by normalizing the brightness.
-		  if ((r * 0.299 + g * 0.587 + b * 0.114) < 128) {
-			r = Math.min(r + 128, 255);
-			g = Math.min(g + 128, 255);
-			b = Math.min(b + 128, 255);
-		  }
-
-		  return (r << 16) + (g << 8) + b;
 	}
 
 	async update_avatar(uid, tar_sprite) {
@@ -2114,10 +2114,16 @@ timer={
 
 		objects.timer_cont.visible=true
 
-		if (my_turn)
-			objects.timer_cont.x=objects.my_card_cont.sx+objects.my_avatar.x+objects.my_avatar.width*0.5
-		else
-			objects.timer_cont.x=objects.opp_card_cont.sx+objects.opp_avatar.x+objects.opp_avatar.width*0.5
+		if (my_turn){
+			objects.my_card_cont.alpha=1
+			objects.opp_card_cont.alpha=0.5
+			objects.timer_cont.x=objects.my_card_cont.sx+objects.my_avatar.x+objects.my_avatar.width*0.5			
+		} else {
+			objects.my_card_cont.alpha=0.5
+			objects.opp_card_cont.alpha=1
+			objects.timer_cont.x=objects.opp_card_cont.sx+objects.opp_avatar.x+objects.opp_avatar.width*0.5			
+		}
+
 
 	},
 
@@ -3163,7 +3169,6 @@ fin={
 		//теперь уже не мой ход
 		my_turn_started=0
 		my_turn=0
-		
 		timer.start()
 
 		//убираем все окна
@@ -4696,7 +4701,7 @@ common={
 		anim3.add(objects.board_bcg,{alpha:[0,1,'linear']}, true, 0.3);
 
 		//показываем и заполняем мою карточку
-		anim3.add(objects.my_card_cont,{x:[-200,objects.my_card_cont.sx,'linear'],alpha:[0,1,'linear']}, true, 0.3)
+		anim3.add(objects.my_card_cont,{x:[-200,objects.my_card_cont.sx,'linear'],alpha:[0,my_turn?1:0.5,'linear']}, true, 0.3)
 		objects.my_card_rating.text=my_data.rating;
 		objects.my_card_name.set2(my_data.name,160)
 		
@@ -4714,7 +4719,7 @@ common={
 		objects.my_avatar.texture=players_cache.players[my_data.uid].texture
 
 		//показываем и заполняем карточку соперника
-		anim3.add(objects.opp_card_cont,{x:[800,objects.opp_card_cont.sx,'linear'],alpha:[0,1,'linear']}, true, 0.3)
+		anim3.add(objects.opp_card_cont,{x:[800,objects.opp_card_cont.sx,'linear'],alpha:[0,my_turn?0.5:1,'linear']}, true, 0.3)
 		objects.opp_card_name.set2(opp_data.name,160);
 		objects.opp_card_rating.text=opp_data.rating;
 		objects.opp_avatar.texture=players_cache.players[opp_data.uid].texture;
