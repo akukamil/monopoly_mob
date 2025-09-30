@@ -1470,7 +1470,7 @@ message={
 		await anim3.add(objects.message_cont,{alpha:[0,1,'linear']}, true, 0.25,false);
 
 		const res = await new Promise((resolve, reject) => {
-				message.promise_resolve = resolve;
+				message.promise_resolve = resolve
 				setTimeout(resolve, data.timeout)
 			}
 		);
@@ -7407,6 +7407,19 @@ async function init_game_env(lang) {
 
 	//keep-alive сервис
 	setInterval(function()	{keep_alive()}, 40000);
+
+	//контроль за присутсвием
+	fbs.ref('.info/connected').on('value', snap=>{
+		if (snap.val()){
+			if (!connected)
+				sys_msg.add('Связь с сервером восстановлена!')
+			connected = 1
+		}else{
+			if (connected)
+				sys_msg.add('Связь с сервером потеряна!')
+			connected = 0;		  
+		}
+	})
 
 	//убираем попап
 	some_process.loup_anim = function(){};
