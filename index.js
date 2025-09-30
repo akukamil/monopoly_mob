@@ -2657,11 +2657,8 @@ dice={
 				//не ходим на свои города
 				if (next_cell.owner!==player)
 					break
-
 			}
-
 		}
-
 
 		this.roll_res=this.rnd1.toString()+this.rnd2.toString()
 		
@@ -2727,7 +2724,6 @@ dice={
 		anim3.add(objects.roll_dice_btn,{scale_xy:[0.666,0.2,'easeInBack'],alpha:[1,0,'linear']}, false, 0.15);
 
 	}
-
 
 }
 
@@ -2939,8 +2935,11 @@ city_dlg={
 		
 		let type=''
 		
-		if (!cell.owner&&(me_on_cell||common.buy_any_city_bonus))
+		if (!cell.owner&&me_on_cell)
 			type='ONLY_BUY'
+		
+		if (!cell.owner&&!me_on_cell&&common.buy_any_city_bonus)
+			type='ONLY_BUY_BONUS'
 		
 		if (cell.owner===1&&[1,2,3,4,5].includes(cell.level))
 			type='SELL_OR_BUY'
@@ -2961,6 +2960,18 @@ city_dlg={
 			btn2_t.visible=true
 			btn2_t.text=`КУПИТЬ ГОРОД\n-$${cell.price}`
 			btn2.pointerdown=function(){city_dlg.buy_btn_down()}
+		}
+		
+		//покупка просто города
+		if (type==='ONLY_BUY_BONUS'){
+			
+			btn1.visible=false
+			btn1_t.visible=false
+			
+			btn2.visible=true
+			btn2_t.visible=true
+			btn2_t.text=`КУПИТЬ ГОРОД\n-$${cell.price}`
+			btn2.pointerdown=function(){city_dlg.buy_btn_down(1)}
 		}
 		
 		//перекуп просто города
@@ -3037,7 +3048,7 @@ city_dlg={
 		sound.play('city_dlg')
 	},
 
-	buy_btn_down(){
+	buy_btn_down(any_city_bonus){
 
 		const check_buy_res=this.check_buy()
 
@@ -3062,10 +3073,10 @@ city_dlg={
 			return
 		}
 
-		common.buy(1,this.cur_cell)
+		common.buy(1,this.cur_cell,0,any_city_bonus)
 
 		//отправляем сопернику
-		opponent.send({s:my_data.uid,type:'buy',cell_id:this.cur_cell.id,tm:Date.now()})
+		opponent.send({s:my_data.uid,type:'buy',cell_id:this.cur_cell.id,b:any_city_bonus?1:0,tm:Date.now()})
 
 		this.update(this.cur_cell)
 		this.close()
@@ -3543,30 +3554,26 @@ casino={
 			}else{
 				game_msgs.add('Вам выпало потерять пустой город, но у вас их нет)))')	
 			}
-
 		}
 		if (result===3){
-			game_msgs.add('Вы можете купить город соперника!')
+			game_msgs.add('Вы можете выкупить пустой город соперника!')
 			sound.play('can_buy_any_city')
-			common.buy_opp_city_bonus=1
+			common.add_bonus('buy_opp_city_bonus',1)
 		}
 		if (result===4){
 			game_msgs.add('Вы можете купить любой город!')
 			sound.play('can_buy_any_city')
-			common.buy_any_city_bonus=1
+			common.add_bonus('buy_any_city_bonus',1)
 		}
 		if (result===5){
 			game_msgs.add('Вы не платите ренту 3 хода!')
 			sound.play('norent')
 			common.my_no_rent_bonus=3
 		}
+
 		opponent.send({s:my_data.uid,type:'casino_result',result,city_id,tm:Date.now()})
 
 		this.state='fin'
-		//objects.casino_btn1.visible=false
-		//objects.casino_btn2.x=120
-		//objects.casino_btn2.alpha=1
-		//objects.casino_btn2.texture=assets.casino_exit_btn_img
 		
 		setTimeout(()=>{this.close()},1000)
 
@@ -3630,8 +3637,6 @@ casino={
 
 	},
 	
-
-
 }
 
 exch={
@@ -4627,22 +4632,20 @@ bot_game={
 				}else{
 					game_msgs.add('Соперник не смог выкупить город')
 				}
-					
 			}else{
-				game_msgs.add('У вас нет одиноких городов, повезло')	
+				game_msgs.add('У вас нет одиноких городов, повезло)')
 			}
 		}
 		if (result===4){
 			
 			const free_cities=cells_data.filter(c=>c.owner===0)
 			for (let city of free_cities){
-				if (city.price<opp_data.money){					
+				if (city.price<opp_data.money){
 					common.buy(2,city)
 					game_msgs.add('Соперник купил город по акции: '+city.rus_name)
-					return				
-				}				
+					return
+				}
 			}
-			
 			game_msgs.add('Соперник не смог купить город по акции!')
 		}
 		if (result===5){
@@ -4705,6 +4708,7 @@ common={
 		anim3.add(objects.my_card_cont,{x:[-200,objects.my_card_cont.sx,'linear'],alpha:[0,my_turn?1:0.5,'linear']}, true, 0.3)
 		objects.my_card_rating.text=my_data.rating;
 		objects.my_card_name.set2(my_data.name,160)
+		objects.my_shop_cart.visible=false
 		
 		this.on=1
 		
@@ -4723,10 +4727,32 @@ common={
 		anim3.add(objects.opp_card_cont,{x:[800,objects.opp_card_cont.sx,'linear'],alpha:[0,my_turn?0.5:1,'linear']}, true, 0.3)
 		objects.opp_card_name.set2(opp_data.name,160);
 		objects.opp_card_rating.text=opp_data.rating;
-		objects.opp_avatar.texture=players_cache.players[opp_data.uid].texture;
+		objects.opp_avatar.texture=players_cache.players[opp_data.uid].texture
+		objects.opp_shop_cart.visible=false
 		
 		this.prepare_cells()
 
+	},
+	
+	add_bonus(bonus,player){
+	
+		this[bonus]=1
+		
+		if (player===1)
+			objects.my_shop_cart.visible=true
+		else
+			objects.opp_shop_cart.visible=true
+	},
+	
+	consume_bonus(bonus,player){
+		
+		this[bonus]=0
+		
+		if (player===1){
+			objects.my_shop_cart.visible=(this.buy_any_city_bonus||this.buy_any_city_bonus)?true:false
+		}else
+			objects.opp_shop_cart.visible=(opp_data.buy_any_city_bonus||opp_data.buy_any_city_bonus)?true:false
+		
 	},
 	
 	prepare_cells(){
@@ -5103,7 +5129,7 @@ common={
 
 		if (move_data.type==='buy'){
 			const cell=cells_data[move_data.cell_id]
-			this.buy(2,cell)
+			this.buy(2,cell,0,move_data.b)
 		}
 		
 		if (move_data.type==='rebuy'){
@@ -5150,18 +5176,13 @@ common={
 				}
 			}
 			if (move_data.result===3){
-				if (move_data.city_id){
-					const empty_city=cells_data[move_data.city_id]
-					common.capture_empty_city(empty_city)
-					game_msgs.add('Соперник захватил Ваш город '+empty_city?.rus_name)					
-					
-				}else{
-					sys_msg.add('Соперник не смог захватить Ваш город')
-				}
-
+				sys_msg.add('Соперник может выкупить ваш город')
+				this.add_bonus('buy_opp_city_bonus',2)
 			}
+			
 			if (move_data.result===4){
 				sys_msg.add('Соперник может купить любой город')
+				this.add_bonus('buy_any_city_bonus',2)
 			}
 			if (move_data.result===5){
 				sys_msg.add('Соперник не платит ренту 3 хода!')
@@ -5337,7 +5358,9 @@ common={
 		
 		cell.owner=player
 		this.change_money(player,-cell.price)
-		this.buy_opp_city_bonus=0
+		
+		//потребляем бонус
+		this.consume_bonus('buy_opp_city_bonus',player)
 		
 		//обновляем всю страну так как там тоже могло поменяться
 		this.update_view(cell)
@@ -5354,7 +5377,7 @@ common={
 		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.2,'ease2back']}, true, 0.6)
 	},
 	
-	buy(player,cell,prc){
+	buy(player,cell,prc,any_city_bonus){
 
 
 		if (cell.type!=='city') return
@@ -5365,7 +5388,9 @@ common={
 		
 		cell.level++
 		
-		this.buy_any_city_bonus=0
+		//потребляем бонус
+		if (any_city_bonus)
+			this.consume_bonus('buy_any_city_bonus',player)
 		
 		//анимация
 		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
