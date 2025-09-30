@@ -685,9 +685,9 @@ class player_mini_card_class extends PIXI.Container {
 		this.avatar.w=this.avatar.h=60;
 
 		this.avatar_frame=new PIXI.Sprite(assets.chat_avatar_frame_img);
-		this.avatar_frame.x=this.avatar.x-10
-		this.avatar_frame.y=this.avatar.y-10
-		this.avatar_frame.width=this.avatar_frame.height=this.avatar.w+20
+		this.avatar_frame.x=this.avatar.x-12
+		this.avatar_frame.y=this.avatar.y-12
+		this.avatar_frame.width=this.avatar_frame.height=this.avatar.w+24
 
 		this.name=""
 		this.name_text=new PIXI.BitmapText('', {fontName: 'mfont64',fontSize: 22,align: 'center'})
