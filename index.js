@@ -567,7 +567,8 @@ class chat_record_class extends PIXI.Container {
 			0x0000FF,
 			0xC6E0B4,
 			0x0054A8,
-			0xC6E0B4
+			0x9F9DF7,
+			0xFFF2CC
 		]		
 
 		return colors[hash%colors.length]
