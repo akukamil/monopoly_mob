@@ -6116,8 +6116,8 @@ lobby={
 		objects.td_rating1.text = card.rating_text1.text;
 		objects.td_rating2.text = card.rating_text2.text;
 
-		objects.td_name1.set2(card.name1, 220);
-		objects.td_name2.set2(card.name2, 220);
+		objects.td_name1.set2(card.name1, 180);
+		objects.td_name2.set2(card.name2, 180);
 
 	},
 
@@ -7256,8 +7256,8 @@ async function init_game_env(lang) {
 		my_data.pic_url=my_data.orig_pic_url
 
 	//добавляем страну к имени если ее нет
-	if (!auth2.get_country_from_name(my_data.name)&&my_data.country)
-		my_data.name=`${my_data.name} (${my_data.country})`
+	//if (!auth2.get_country_from_name(my_data.name)&&my_data.country)
+	//	my_data.name=`${my_data.name} (${my_data.country})`
 
 	//загружаем мои данные в кэш
 	await players_cache.update(my_data.uid,{pic_url:my_data.pic_url,country:my_data.country,name:my_data.name,rating:my_data.rating});
