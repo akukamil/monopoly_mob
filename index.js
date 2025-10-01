@@ -1272,24 +1272,24 @@ process_new_message = function(msg) {
 
 			//получение отказа от игры
 			if (msg.m==='REFUSE')
-				confirm_dialog.opponent_confirm_play(0);
+				confirm_dialog.opponent_confirm_play(0)
 
 			//получение согласия на игру
 			if (msg.m==='CONF')
-				confirm_dialog.opponent_confirm_play(1);
+				confirm_dialog.opponent_confirm_play(1)
 
 			//получение стикера
 			if (msg.m==='STCR')
-				stickers.receive(msg.data);
+				stickers.receive(msg.data)
 
 			//получение сообщение с сдаче
 			if (msg.m==='END')
-				common.stop('opp_giveup');
+				common.stop('opp_giveup')
 			
 
 
 			if (['exch','plan','exch_decline','exch_approve','buy','sell','rebuy','fin','roll','casino_accept','casino_decline','casino_result'].includes(msg.type))
-				common.process_opp_move(msg);
+				common.process_opp_move(msg)
 
 			if (['auc_bid','auc_buy','auc_dec','auc_dec2','auc_giveup'].includes(msg.type))
 				auc.opp_bid(msg)
@@ -3410,8 +3410,9 @@ casino={
 	state:'',
 	roll_sound_timer:0,
 	roll_rimer:0,
+	pay_to_play:0,
 
-	activate(){
+	activate(pay_to_play){
 
 		sound.play('casino')
 		this.state='ready'
@@ -3459,12 +3460,12 @@ casino={
 		let city_id=0
 		
 		if (result===0){
-			sound.play('lost300')
+			sound.play('win300')
 			game_msgs.add('Вы выиграли 300 $ в казино')
 			common.change_money(1,300)
 		}
 		if (result===1){
-			sound.play('casino_m_300')
+			sound.play('lost300')
 			game_msgs.add('Вы проиграли 300 $ в казино')
 			common.change_money(1,-300)
 		}
@@ -3482,12 +3483,12 @@ casino={
 		}
 		if (result===3){
 			game_msgs.add('Вы можете выкупить пустой город соперника!')
-			sound.play('can_buy_any_city')
+			sound.play('bonus')
 			common.add_bonus('buy_opp_city_bonus',1)
 		}
 		if (result===4){
 			game_msgs.add('Вы можете купить любой город!')
-			sound.play('can_buy_any_city')
+			sound.play('bonus')
 			common.add_bonus('buy_any_city_bonus',1)
 		}
 		if (result===5){
@@ -3497,9 +3498,7 @@ casino={
 		}
 
 		opponent.send({s:my_data.uid,type:'casino_result',result,city_id,tm:Date.now()})
-
-		this.state='fin'
-		
+		this.state='fin'		
 		setTimeout(()=>{this.close()},1000)
 
 	},
@@ -3515,7 +3514,6 @@ casino={
 
 	btn1_down(){
 
-
 		if (this.state==='roll'){
 			return
 		}
@@ -3526,8 +3524,6 @@ casino={
 			this.close()
 			return
 		}
-
-		objects.casino_info.text='недоступно'
 
 	},
 
@@ -4536,6 +4532,7 @@ bot_game={
 		let city_id=0
 		
 		if (result===0){
+			sound.play('win300')
 			game_msgs.add('Соперник выиграл 300 $ в казино')
 			common.change_money(2,300)
 		}
@@ -4576,6 +4573,7 @@ bot_game={
 			for (let city of free_cities){
 				if (city.price<opp_data.money){
 					common.buy(2,city)
+					sound.play('bonus')
 					game_msgs.add('Соперник купил город по акции: '+city.rus_name)
 					return
 				}
@@ -4772,22 +4770,25 @@ common={
 
 		const cell=cells_data[id]
 
-		//если открыта торговля то переносим в торговлю не улучшеные города
-		if (exch.on){
-			exch.cell_down(cell)
-			return
-		}
-		
 		//выбор сервисных клеток
-		if (cell.type!=='city'){
-			sys_msg.add('Эта клетка не доступна!')
-			return
+		if (cell.type==='city'){
+			
+			//если открыта торговля то переносим в торговлю не улучшеные города
+			if (exch.on)
+				exch.cell_down(cell)
+			else
+				city_dlg.show(cell)
 		}
 
-
-		city_dlg.show(cell)
+		//выбор сервисных клеток
+		if (cell.type==='casino'){
+			if (this.pay_casino_played)
+				sys_msg.add('Вы уже сыграли в казино!')
+			else
+				casino.activate(1)
+		}
 	},
-
+	
 	exch_down(){
 
 		if(!this.on) return
@@ -5095,16 +5096,19 @@ common={
 			
 			if (move_data.result===0){
 				game_msgs.add('Соперник выиграл 300 $ в казино')
+				sound.play('win300')
 				common.change_money(2,300)
 			}
 			if (move_data.result===1){
 				game_msgs.add('Соперник проиграл 300 $ в казино')
+				sound.play('lost300')
 				common.change_money(2,-300)
 			}
 			if (move_data.result===2){
 				if (move_data.city_id){
 					const empty_city=cells_data[move_data.city_id]
-					common.remove_empty_city(empty_city)				
+					common.remove_empty_city(empty_city)
+					sound.play('city_lost')
 					game_msgs.add('Соперник потреял город '+empty_city?.rus_name)
 				}else{
 					game_msgs.add('Соперник чуть не потерял город в казино')
@@ -5112,15 +5116,17 @@ common={
 			}
 			if (move_data.result===3){
 				sys_msg.add('Соперник может выкупить ваш город')
+				sound.play('bonus')
 				this.add_bonus('buy_opp_city_bonus',2)
-			}
-			
+			}			
 			if (move_data.result===4){
 				sys_msg.add('Соперник может купить любой город')
+				sound.play('bonus')
 				this.add_bonus('buy_any_city_bonus',2)
 			}
 			if (move_data.result===5){
 				sys_msg.add('Соперник не платит ренту 3 хода!')
+				sound.play('norent')
 				common.opp_no_rent_bonus=3
 			}
 		}
@@ -5364,43 +5370,42 @@ common={
 
 	sell(player,cell){
 
-		if (cell.type==='city'){
+		if (cell.type!=='city') return
 
-			if (player===2)
-				game_msgs.add('Соперник продал '+['','город','дом','дом','дом','дом','отель'][cell.level] +' ('+ cell.rus_name +')')
-			else
-				game_msgs.add('Вы продали '+['','город','дом','дом','дом','дом','отель'][cell.level] +' ('+ cell.rus_name +')')
+		if (player===2)
+			game_msgs.add('Соперник продал '+['','город','дом','дом','дом','дом','отель'][cell.level] +' ('+ cell.rus_name +')')
+		else
+			game_msgs.add('Вы продали '+['','город','дом','дом','дом','дом','отель'][cell.level] +' ('+ cell.rus_name +')')
 
-			sound.play('sell')
+		sound.play('sell')
 
-			//продан отель, получаем дома из банка
-			if (cell.level===6) {
-				this.houses_num-=4
-				objects.houses_info.text='Домов в банке: '+this.houses_num
-			}
-
-			//продан дом, возвращаем дома в банк
-			if (cell.level>1&&cell.level<6){
-				this.houses_num++
-				objects.houses_info.text='Домов в банке: '+this.houses_num
-			}
-
-
-			cell.level--
-			
-			//анимация
-			anim3.add(objects.cells[cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
-
-			if(!cell.level) cell.owner=0
-
-			const price=Math.round((cell.level>1?cell.house_cost:cell.price)*0.5)
-			this.change_money(player,price)
-
-			//обновляем всю страну так как там тоже могло поменяться
-			this.update_view(cell)
-			
-			timer.start()
+		//продан отель, получаем дома из банка
+		if (cell.level===6) {
+			this.houses_num-=4
+			objects.houses_info.text='Домов в банке: '+this.houses_num
 		}
+
+		//продан дом, возвращаем дома в банк
+		if (cell.level>1&&cell.level<6){
+			this.houses_num++
+			objects.houses_info.text='Домов в банке: '+this.houses_num
+		}
+
+		cell.level--
+		
+		//анимация
+		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
+
+		if(!cell.level) cell.owner=0
+
+		const price=Math.round((cell.level>1?cell.house_cost:cell.price)*0.5)
+		this.change_money(player,price)
+
+		//обновляем всю страну так как там тоже могло поменяться
+		this.update_view(cell)
+		
+		timer.start()
+		
 	},
 	
 	async stop(res){
@@ -6914,8 +6919,7 @@ main_loader={
 		loader.add('auc_bid',git_src+'sounds/auc_bid.mp3')
 		loader.add('auc_change',git_src+'sounds/auc_change.mp3')
 		loader.add('achivement',git_src+'sounds/achivement.mp3')
-		loader.add('can_buy_any_city',git_src+'sounds/can_buy_any_city.mp3')
-		loader.add('casino_m_300',git_src+'sounds/casino_m_300.mp3')
+		loader.add('bonus',git_src+'sounds/bonus.mp3')
 		loader.add('money',git_src+'sounds/money.mp3')
 		loader.add('capture_city',git_src+'sounds/capture_city.mp3')
 		loader.add('hotel_buy',git_src+'sounds/hotel_buy.mp3')
@@ -6932,6 +6936,7 @@ main_loader={
 		loader.add('casino',git_src+'sounds/casino.mp3')
 		loader.add('decline',git_src+'sounds/decline.mp3')
 		loader.add('lost300',git_src+'sounds/lost300.mp3')
+		loader.add('win300',git_src+'sounds/win300.mp3')
 		loader.add('norent',git_src+'sounds/norent.mp3')
 		loader.add('receive_sticker',git_src+'sounds/receive_sticker.mp3')
 		loader.add('online_message',git_src+'sounds/online_message.mp3')
