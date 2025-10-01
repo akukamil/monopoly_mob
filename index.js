@@ -1,6 +1,6 @@
 const M_WIDTH=450, M_HEIGHT=800;
 var app, assets={},fbs,SERVER_TM, game_name='monopoly', yndx_payments, game, client_id, objects={}, state='',my_role="", game_tick=0, made_moves=0, game_id=0, my_turn=0,my_turn_started=0, opponent=0,connected = 1, LANG = 0, hidden=0, h_state=0, game_platform="",git_src='./', room_name = '',pending_player='',tm={}, some_process = {}, my_data={opp_id : ''},opp_data={};
-
+const CASINO_PRICE_TO_PAY=100
 const WIN = 1, DRAW = 0, LOSE = -1, NOSYNC = 2;
 
 const cells_data=[{id:0,type:"start"},{id:1,type:"city",rus_name:"Канпур",eng_name:"Kanpur",country:1,price:50,house_cost:50,rent:[0,5,20,60,140,170,200],owner:0,level:0},{id:2,type:"city",rus_name:"Сурат",eng_name:"Surat",country:1,price:50,house_cost:50,auc:1,rent:[0,5,20,60,140,170,200],owner:0,level:0},{id:3,type:"city",rus_name:"Дели",eng_name:"Deli",country:1,price:50,house_cost:50,rent:[0,5,20,60,140,170,200],owner:0,level:0},{id:4,type:"city",rus_name:"Уфа",eng_name:"Ufa",country:2,price:75,house_cost:75,rent:[0,9,32,97,227,275,324],owner:0,level:0},{id:5,type:"city",rus_name:"Казань",eng_name:"Kazan",country:2,price:75,house_cost:75,auc:1,rent:[0,9,32,97,227,275,324],owner:0,level:0},{id:6,type:"city",rus_name:"Москва",eng_name:"Moscow",country:2,price:75,house_cost:75,rent:[0,9,32,97,227,275,324],owner:0,level:0},{id:7,type:"casino"},{id:8,type:"city",rus_name:"Холон",eng_name:"Holon",country:3,price:100,house_cost:100,rent:[0,14,45,136,318,386,454],owner:0,level:0},{id:9,type:"city",rus_name:"Ашдод",eng_name:"Ashdod",country:3,price:100,house_cost:100,auc:1,rent:[0,14,45,136,318,386,454],owner:0,level:0},{id:10,type:"city",rus_name:"София",eng_name:"Sofia",country:4,price:125,house_cost:125,rent:[0,20,58,175,408,496,583],owner:0,level:0},{id:11,type:"city",rus_name:"Варна",eng_name:"Varna",country:4,price:125,house_cost:125,auc:1,rent:[0,20,58,175,408,496,583],owner:0,level:0},{id:12,type:"casino"},{id:13,type:"city",rus_name:"Рим",eng_name:"Rim",country:5,price:150,house_cost:150,rent:[0,27,71,213,496,602,709],owner:0,level:0},{id:14,type:"city",rus_name:"Милан",eng_name:"Milan",country:5,price:150,house_cost:150,auc:1,rent:[0,27,71,213,496,602,709],owner:0,level:0},{id:15,type:"city",rus_name:"Турин",eng_name:"Turin",country:5,price:150,house_cost:150,rent:[0,27,71,213,496,602,709],owner:0,level:0},{id:16,type:"city",rus_name:"Лондон",eng_name:"London",country:6,price:200,house_cost:200,rent:[0,40,94,283,661,803,945],owner:0,level:0},{id:17,type:"city",rus_name:"Глазго",eng_name:"Glazgo",country:6,price:200,house_cost:200,auc:1,rent:[0,40,94,283,661,803,945],owner:0,level:0},{id:18,type:"city",rus_name:"Плимут",eng_name:"Plimut",country:6,price:200,house_cost:200,rent:[0,40,94,283,661,803,945],owner:0,level:0},{id:19,type:"casino"},{id:20,type:"city",rus_name:"Париж",eng_name:"Paris",country:7,price:250,house_cost:250,rent:[0,55,117,351,818,994,1169],owner:0,level:0},{id:21,type:"city",rus_name:"Лион",eng_name:"Lyon",country:7,price:250,house_cost:250,auc:1,rent:[0,55,117,351,818,994,1169],owner:0,level:0},{id:22,type:"city",rus_name:"Даллас",eng_name:"Dallas",country:8,price:300,house_cost:300,rent:[0,72,138,413,964,1171,1377],owner:0,level:0},{id:23,type:"city",rus_name:"Чикаго",eng_name:"Chicago",country:8,price:300,house_cost:300,auc:1,rent:[0,72,138,413,964,1171,1377],owner:0,level:0}]
@@ -3099,7 +3099,10 @@ fin={
 		my_turn_started=0
 		my_turn=0
 		timer.start()
-
+		
+		//сброс платного казино
+		common.pay_casino_played=0
+		
 		//убираем все окна
 		objects.roll_dice_btn.visible=false
 		objects.auc_cont.visible=false
@@ -3416,6 +3419,7 @@ casino={
 
 		sound.play('casino')
 		this.state='ready'
+		this.pay_to_play=pay_to_play||0
 		this.bid=Math.min(100,my_data.money)
 		//objects.casino_bid.text=this.bid+' $'
 		
@@ -3428,7 +3432,7 @@ casino={
 
 		//objects.casino_btn2.x=170
 		objects.casino_btn2.alpha=1
-		objects.casino_btn2.texture=assets.casino_btn2
+		objects.casino_btn2.texture=pay_to_play?assets.casino_spin_btn2:assets.casino_btn2
 
 		objects.casino_icon.tilePosition.y=0
 		//objects.casino_icon2.tilePosition.y=60
@@ -3537,7 +3541,17 @@ casino={
 			return
 		}
 
-		opponent.send({s:my_data.uid,type:'casino_accept',tm:Date.now()})
+		//платный вариант
+		if(this.pay_to_play){
+			if (my_data.money<CASINO_PRICE_TO_PAY){
+				sys_msg.add('Недостаточно денег!')
+				return
+			}
+			common.pay_casino_played=1
+			common.change_money(1,-CASINO_PRICE_TO_PAY)
+		}
+
+		opponent.send({s:my_data.uid,type:'casino_accept',pay_to_play:this.pay_to_play,tm:Date.now()})
 
 		this.state='roll'
 		
@@ -4524,9 +4538,7 @@ bot_game={
 
 	},
 	
-	play_casino(tar_result){
-		
-		
+	play_casino(tar_result){		
 		
 		const result=tar_result||irnd(0,5)
 		let city_id=0
@@ -4601,6 +4613,7 @@ common={
 	my_no_rent_bonus:0,
 	opp_no_rent_bonus:0,
 	move_on:0,
+	pay_casino_played:0,
 
 	activate(){
 
@@ -4722,6 +4735,9 @@ common={
 			}
 
 			if (cell.type==='casino'){
+				cell_obj.interactive=true
+				cell_obj.buttonMode=true
+				cell_obj.pointerdown=function(){common.cell_down(i)}
 				cell_obj.bcg.texture=assets.big_cell_casino_bcg
 				cell_obj.price.visible=false
 				cell_obj.city_name.visible=false
@@ -5087,7 +5103,7 @@ common={
 		if (move_data.type==='casino_accept'){
 			sys_msg.add('Соперник играет в казино...')
 			if(move_data.pay_to_play)
-				common.change_money(2,-250)
+				common.change_money(2,-CASINO_PRICE_TO_PAY)
 		}
 
 		if (move_data.type==='casino_decline'){
