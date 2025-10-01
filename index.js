@@ -4741,8 +4741,6 @@ common={
 				cell_obj.bcg.texture=assets.big_cell_casino_bcg
 				cell_obj.price.visible=false
 				cell_obj.city_name.visible=false
-				cell_obj.interactive=false
-				cell_obj.buttonMode=false
 				cell_obj.auc_icon.visible=false
 				cell_obj.icon.visible=false
 			}
