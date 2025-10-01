@@ -36,89 +36,6 @@ r2 = (v)=>{
 	return (v >= 0 || -1) * Math.round(Math.abs(v)*10000)/10000;
 }
 
-quat={
-
-	multiply( a, b ) {
-
-		let q = {};
-
-		const qax = a.x, qay = a.y, qaz = a.z, qaw = a.w;
-		const qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
-
-		q.x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
-		q.y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
-		q.z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
-		q.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
-
-		return q;
-	},
-
-	normalizeVector(vector) {
-	  const x = vector.x;
-	  const y = vector.y;
-	  const z = vector.z;
-
-	  const magnitude = Math.sqrt(x * x + y * y + z * z);
-
-	  if (magnitude !== 0) {
-		vector.x=x / magnitude,
-		vector.y=y / magnitude,
-		vector.z=z / magnitude
-	  } else {
-		throw new Error("Cannot normalize a zero vector.");
-	  }
-	},
-
-	vec_len2D(vec){
-
-		return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
-
-	},
-
-	create(vec, ang){
-
-		this.normalizeVector(vec);
-		const q={w:0,x:0,y:0,z:0};
-		const halfAngle = ang / 2
-		const s = Math.sin(halfAngle);
-		q.x = vec.x * s;
-		q.y = vec.y * s;
-		q.z = vec.z * s;
-		q.w = Math.cos( halfAngle );
-		return q;
-	},
-
-	update(q, vec, ang){
-		this.normalizeVector(vec);
-		const halfAngle = ang / 2
-		const s = Math.sin(halfAngle);
-		q.x = vec.x * s;
-		q.y = vec.y * s;
-		q.z = vec.z * s;
-		q.w = Math.cos( halfAngle );
-	},
-
-	rotate_vec_by_quat(vec, q){
-
-		//результат вращения вектора
-		const rot_quat2={w:q.w,x:-q.x,y:-q.y,z:-q.z};
-		const qm1=this.multiply(q,vec);
-		const res=this.multiply(qm1,rot_quat2);
-		vec.x=res.x;
-		vec.y=res.y;
-		vec.z=res.z;
-
-	},
-
-	angleToZ(vec) {
-		const dotProduct = vec.z;
-		const magnitude = Math.sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
-		const angleInRadians = Math.acos(dotProduct / magnitude);
-		return angleInRadians*180/Math.PI;
-	}
-
-}
-
 irnd = function(min,max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -1346,7 +1263,6 @@ process_new_message = function(msg) {
 	if (msg.m==='CLIEND_ID')
 		if (msg.client_id !== client_id)
 			kill_game()
-
 
 	//получение сообщение в состояни игры
 	if (state==='p') {
@@ -2647,7 +2563,7 @@ dice={
 		}else{
 
 			//выбираем более интересные значения
-			for (let i=0;i<3;i++){
+			for (let i=0;i<2;i++){
 
 				this.rnd1=irnd(1,6)
 				this.rnd2=irnd(1,6)
