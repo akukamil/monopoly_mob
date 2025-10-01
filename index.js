@@ -3546,11 +3546,12 @@ casino={
 			if (my_data.money<CASINO_PRICE_TO_PAY){
 				sys_msg.add('Недостаточно денег!')
 				return
-			}
-			common.pay_casino_played=1
+			}			
 			common.change_money(1,-CASINO_PRICE_TO_PAY)
 		}
-
+		
+		common.pay_casino_played=1
+		
 		opponent.send({s:my_data.uid,type:'casino_accept',pay_to_play:this.pay_to_play,tm:Date.now()})
 
 		this.state='roll'
