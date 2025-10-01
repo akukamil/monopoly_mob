@@ -4483,11 +4483,11 @@ bot_game={
 		}
 
 		//казино
-		if (cell.type==='casino'){
-			
-			this.play_casino()
-			scheduler.add(()=>{this.try_upgrade_some_city()},1000)
-			scheduler.add(()=>{common.opp_fin_move_event()},2000)
+		if (cell.type==='casino'){			
+			common.process_opp_move({type:'casino_accept'})
+			scheduler.add(()=>{this.play_casino()},2000)
+			scheduler.add(()=>{this.try_upgrade_some_city()},3000)
+			scheduler.add(()=>{common.opp_fin_move_event()},3500)
 		}
 
 		//цели
@@ -4526,11 +4526,12 @@ bot_game={
 	
 	play_casino(tar_result){
 		
-		common.process_opp_move({type:'casino_accept'})
+		
 		
 		const result=tar_result||irnd(0,5)
 		let city_id=0
 		
+		//результат				
 		if (result===0){
 			sound.play('win300')
 			game_msgs.add('Соперник выиграл 300 $ в казино')
@@ -4572,9 +4573,9 @@ bot_game={
 			const free_cities=cells_data.filter(c=>c.owner===0)
 			for (let city of free_cities){
 				if (city.price<opp_data.money){
+					game_msgs.add('Соперник выиграл покупку любого города')
 					common.buy(2,city)
 					sound.play('bonus')
-					game_msgs.add('Соперник купил город по акции: '+city.rus_name)
 					return
 				}
 			}
@@ -4585,6 +4586,7 @@ bot_game={
 			sound.play('norent')
 			game_msgs.add('Соперник не платит ренту 3 хода!')
 		}
+
 	}
 		
 }
