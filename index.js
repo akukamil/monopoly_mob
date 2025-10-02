@@ -1,6 +1,7 @@
 const M_WIDTH=450, M_HEIGHT=800;
 var app, assets={},fbs,SERVER_TM, game_name='monopoly', yndx_payments, game, client_id, objects={}, state='',my_role="", game_tick=0, made_moves=0, game_id=0, my_turn=0,my_turn_started=0, opponent=0,connected = 1, LANG = 0, hidden=0, h_state=0, game_platform="",git_src='./', room_name = '',pending_player='',tm={}, some_process = {}, my_data={opp_id : ''},opp_data={};
 const CASINO_PRICE_TO_PAY=100
+const START_CAPITAL=1000
 const WIN = 1, DRAW = 0, LOSE = -1, NOSYNC = 2;
 
 const cells_data=[{id:0,type:"start"},{id:1,type:"city",rus_name:"Канпур",eng_name:"Kanpur",country:1,price:50,house_cost:50,rent:[0,5,20,60,140,170,200],owner:0,level:0},{id:2,type:"city",rus_name:"Сурат",eng_name:"Surat",country:1,price:50,house_cost:50,auc:1,rent:[0,5,20,60,140,170,200],owner:0,level:0},{id:3,type:"city",rus_name:"Дели",eng_name:"Deli",country:1,price:50,house_cost:50,rent:[0,5,20,60,140,170,200],owner:0,level:0},{id:4,type:"city",rus_name:"Уфа",eng_name:"Ufa",country:2,price:75,house_cost:75,rent:[0,9,32,97,227,275,324],owner:0,level:0},{id:5,type:"city",rus_name:"Казань",eng_name:"Kazan",country:2,price:75,house_cost:75,auc:1,rent:[0,9,32,97,227,275,324],owner:0,level:0},{id:6,type:"city",rus_name:"Москва",eng_name:"Moscow",country:2,price:75,house_cost:75,rent:[0,9,32,97,227,275,324],owner:0,level:0},{id:7,type:"casino"},{id:8,type:"city",rus_name:"Холон",eng_name:"Holon",country:3,price:100,house_cost:100,rent:[0,14,45,136,318,386,454],owner:0,level:0},{id:9,type:"city",rus_name:"Ашдод",eng_name:"Ashdod",country:3,price:100,house_cost:100,auc:1,rent:[0,14,45,136,318,386,454],owner:0,level:0},{id:10,type:"city",rus_name:"София",eng_name:"Sofia",country:4,price:125,house_cost:125,rent:[0,20,58,175,408,496,583],owner:0,level:0},{id:11,type:"city",rus_name:"Варна",eng_name:"Varna",country:4,price:125,house_cost:125,auc:1,rent:[0,20,58,175,408,496,583],owner:0,level:0},{id:12,type:"casino"},{id:13,type:"city",rus_name:"Рим",eng_name:"Rim",country:5,price:150,house_cost:150,rent:[0,27,71,213,496,602,709],owner:0,level:0},{id:14,type:"city",rus_name:"Милан",eng_name:"Milan",country:5,price:150,house_cost:150,auc:1,rent:[0,27,71,213,496,602,709],owner:0,level:0},{id:15,type:"city",rus_name:"Турин",eng_name:"Turin",country:5,price:150,house_cost:150,rent:[0,27,71,213,496,602,709],owner:0,level:0},{id:16,type:"city",rus_name:"Лондон",eng_name:"London",country:6,price:200,house_cost:200,rent:[0,40,94,283,661,803,945],owner:0,level:0},{id:17,type:"city",rus_name:"Глазго",eng_name:"Glazgo",country:6,price:200,house_cost:200,auc:1,rent:[0,40,94,283,661,803,945],owner:0,level:0},{id:18,type:"city",rus_name:"Плимут",eng_name:"Plimut",country:6,price:200,house_cost:200,rent:[0,40,94,283,661,803,945],owner:0,level:0},{id:19,type:"casino"},{id:20,type:"city",rus_name:"Париж",eng_name:"Paris",country:7,price:250,house_cost:250,rent:[0,55,117,351,818,994,1169],owner:0,level:0},{id:21,type:"city",rus_name:"Лион",eng_name:"Lyon",country:7,price:250,house_cost:250,auc:1,rent:[0,55,117,351,818,994,1169],owner:0,level:0},{id:22,type:"city",rus_name:"Даллас",eng_name:"Dallas",country:8,price:300,house_cost:300,rent:[0,72,138,413,964,1171,1377],owner:0,level:0},{id:23,type:"city",rus_name:"Чикаго",eng_name:"Chicago",country:8,price:300,house_cost:300,auc:1,rent:[0,72,138,413,964,1171,1377],owner:0,level:0}]
@@ -3107,7 +3108,6 @@ fin={
 		objects.roll_dice_btn.visible=false
 		objects.auc_cont.visible=false
 		objects.cell_info_cont.visible=false
-		objects.plans_cont.visible=false
 		objects.exch_cont.visible=false
 		
 		anim3.add(objects.end_turn_btn,{scale_xy:[0.666,0.2,'easeInBack'],alpha:[1,0,'linear']}, false, 0.15);
@@ -3857,143 +3857,6 @@ exch={
 
 }
 
-plans={
-
-	plans_progress:[0,0,0],
-	action_made:0,
-
-	activate(){
-
-		this.action_made=0
-		anim3.add(objects.plans_cont,{alpha:[0, 1,'linear'],scale_xy:[1,1.1,'ease2back']}, true, 0.2)
-		objects.plans_get100_btn.alpha=1
-		this.update()
-		sound.play('plans_popup')
-
-	},
-
-	close_btn_down(){
-
-		//sound.play('click')
-		anim3.add(objects.plans_cont,{scale_xy:[1,0.5,'easeInBack'],alpha:[1,0,'linear']}, false, 0.5)
-		common.show_done_btn()
-
-	},
-	
-	update(){
-
-		for (let i=0;i<3;i++){
-			objects.plans_mask[i].width=this.plans_progress[i]
-
-			if (this.plans_progress[i]===100)
-				objects.plans_btn_title[i].text='Применить'
-			else
-				objects.plans_btn_title[i].text='Доработать'
-
-			objects.plans_ready_info[i].text=this.plans_progress[i]+'%'
-		}
-
-	},
-
-	bcg_down(e){
-
-		const mx = e.data.global.x/app.stage.scale.x
-		const my = e.data.global.y/app.stage.scale.y
-
-		if (mx>360||mx<240) return
-
-		let i=0
-		if (my>360&&my<400) i=0
-		if (my>430&&my<470) i=1
-		if (my>500&&my<540) i=2
-
-		if (this.action_made){
-			sys_msg.add('Вы уже сделали выбор')
-			return
-		}
-
-		setTimeout(()=>{this.close_btn_down()},300)
-		
-		//активация бонуса
-		if (this.plans_progress[i]===100){
-
-			if (i===0){
-				//захват одинокого города
-				const empty_cities=common.get_empty_cities(2)
-				if(empty_cities.length){
-					
-					const city_cell=empty_cities[irnd(0,empty_cities.length-1)]
-					game_msgs.add('Вы достигли цели ВОЙНА и захватили город '+city_cell.rus_name)
-					common.capture_empty_city(city_cell)
-					opponent.send({s:my_data.uid,type:'plan',id:i,city_id:city_cell.id,tm:Date.now()})
-				}else{
-					sys_msg.add('Данный план невозможно сейчас реализовать')
-					return
-				}
-			}
-
-			if (i===1){
-				common.set_money(2,-300)
-				game_msgs.add('Вы достигли цели КРАЖА баланс соперника -300$ )))')
-				opponent.send({s:my_data.uid,type:'plan',id:i,tm:Date.now()})
-			}
-
-			if (i===2){
-				common.change_money(1,2000)
-				game_msgs.add('Вы достигли цели НАСЛЕДСТВО (+2000 $)')
-				opponent.send({s:my_data.uid,type:'plan',id:i,tm:Date.now()})
-			}
-
-
-			sound.play('achivement')
-			this.plans_progress[i]=0
-			this.update()
-			this.action_made=1
-			return
-		}
-		
-		if (my_data.money<50){
-			sys_msg.add('Недостаточно денег для улучшения!')
-			sound.play('decline')
-			return
-		}
-
-		sound.play('plans_click')
-		this.action_made=1
-		common.change_money(1,-50)
-		this.plans_progress[i]+=25
-		this.plans_progress[i]=Math.min(this.plans_progress[i],100)
-		
-		game_msgs.add('Вы доработали план '+['ВОЙНА','КРАЖА','НАСЛЕДСТВО'][i])
-
-		objects.plans_mask[i].width=this.plans_progress[i]
-		objects.plans_ready_info[i].text=this.plans_progress[i]+'%'
-		
-		opponent.send({s:my_data.uid,type:'plan',id:-1,tm:Date.now()})
-
-		this.update()
-		
-		
-
-	},
-
-	get100_btn_down(){
-
-		if (this.action_made){
-			sys_msg.add('Вы уже сделали выбор')
-			return
-		}
-		
-		this.action_made=1
-		objects.plans_get100_btn.alpha=0.5
-		common.change_money(1,100)
-		game_msgs.add('Вы получили 100 $')
-		opponent.send({s:my_data.uid,type:'plan',id:100,tm:Date.now()})
-		setTimeout(()=>{this.close_btn_down()},300)
-	}
-
-}
-
 online_game={
 
 	on:0,
@@ -4209,7 +4072,6 @@ online_game={
 		
 		objects.auc_cont.visible=false
 		objects.cell_info_cont.visible=false
-		objects.plans_cont.visible=false
 		objects.casino_cont.visible=false
 		objects.exch_cont.visible=false
 		sys_msg.close()
@@ -4235,7 +4097,6 @@ online_game={
 
 bot_game={
 
-	plans_progress:[0,0,0],
 	on:0,
 	opp_conf_play:0,
 	me_conf_play:0,
@@ -4261,8 +4122,7 @@ bot_game={
 		objects.exch_btn.visible=false
 		objects.giveup_btn.visible=false
 		
-		this.plans_progress=[0,0,0]		
-		
+	
 		objects.timer_text.text='!!!'
 		
 		common.activate()
@@ -4330,7 +4190,6 @@ bot_game={
 		
 		objects.auc_cont.visible=false
 		objects.cell_info_cont.visible=false
-		objects.plans_cont.visible=false
 		objects.exch_cont.visible=false
 		casino.clear()
 		scheduler.stop_all()
@@ -4504,38 +4363,7 @@ bot_game={
 			scheduler.add(()=>{this.try_upgrade_some_city()},3000)
 			scheduler.add(()=>{common.opp_fin_move_event()},3500)
 		}
-
-		//цели
-		if (cell.type==='?'){
-			
-			if (this.plans_progress[0]>=100){
-				const empty_cities=common.get_empty_cities(1)
-				
-				if(empty_cities.length) {
-					const empty_city=empty_cities[irnd(0,empty_cities.length-1)]
-					common.capture_empty_city(empty_city)
-					this.plans_progress[0]=0
-					sound.play('achivement')
-					game_msgs.add('Соперник реализовал план Захват ('+empty_city.rus_name+')')
-				}else{
-					
-					game_msgs.add('Соперник не смог реализовать план Захват!')
-				}
-			}else{
-				if (opp_data.money>50){
-					game_msgs.add('Соперник доработал план')
-					this.plans_progress[0]+=25
-					common.change_money(2,-50)
-				}else{
-					game_msgs.add('Соперник получил 100$')
-					common.change_money(2,100)
-				}
-
-			}
-
-			scheduler.add(()=>{this.try_upgrade_some_city()},1000)
-			scheduler.add(()=>{common.opp_fin_move_event()},2000)
-		}
+	
 
 	},
 	
@@ -4572,7 +4400,7 @@ bot_game={
 			const empty_cities=common.get_empty_cities(1)
 			if (empty_cities.length){
 				const empty_city=empty_cities.find(city=>city.price<opp_data.money)
-				if (empty_city&&empty_city.price<my_data.money){
+				if (empty_city){
 					common.rebuy(2,empty_city)
 				}else{
 					game_msgs.add('Соперник не смог выкупить город')
@@ -4636,8 +4464,7 @@ common={
 
 		anim3.add(objects.game_btns_cont,{y:[800,objects.game_btns_cont.sy,'linear']}, true, 0.3)
 
-		//objects.bcg.texture=assets.lobby_bcg
-		plans.plans_progress=[0,0,0]		
+
 		
 		//бонусы не платить ренту
 		this.my_no_rent_bonus=0
@@ -4664,8 +4491,8 @@ common={
 		game_msgs.activate()
 		
 		//начальный баланс
-		this.set_money(1,1000)
-		this.set_money(2,1000)
+		this.set_money(1,START_CAPITAL)
+		this.set_money(2,START_CAPITAL)
 		
 		sound.play('game_start')
 		
@@ -5049,12 +4876,6 @@ common={
 				casino.activate()
 		}
 
-		//цели
-		if (cell.type==='?'){
-			if(cur_player===1)
-				plans.activate()
-		}
-
 		//завершение хода
 		if (cur_player===1){
 			//objects.roll_dice_btn.visible=false			
@@ -5226,8 +5047,8 @@ common={
 		for (let cell of cells_data){
 			if(cell.owner===player&&cell.level===1){
 				const country=cells_data.filter(d=>d.country===cell.country)
-				const no_monopolised=country.some(c=>{return c.owner!==player})
-				if (no_monopolised)
+				const country_not_built=country.every(c=>{return c.level<2})
+				if (country_not_built)
 					empty_cities.push(cell)
 			}
 		}
@@ -5272,6 +5093,9 @@ common={
 			opp_data.money+=amount
 			objects.opp_card_money.text=opp_data.money+'$'
 		}
+	
+		this.update_total_capital()
+	
 	},
 
 	set_money(player, amount){
@@ -5285,6 +5109,8 @@ common={
 			opp_data.money=amount
 			objects.opp_card_money.text=opp_data.money+'$'
 		}
+	
+		this.update_total_capital()
 	},
 
 	place_chip(chip, cell_id){
@@ -5331,6 +5157,8 @@ common={
 		else
 			game_msgs.add('Вы выкупили город соперника ' + '('+ cell.rus_name +')')
 		
+		this.update_total_capital()
+		
 		//анимация
 		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.2,'ease2back']}, true, 0.6)
 	},
@@ -5342,9 +5170,10 @@ common={
 
 		const price=prc||(cell.level>0?cell.house_cost:cell.price)
 		cell.owner=player
-		this.change_money(player,-price)
-		
 		cell.level++
+		
+		this.change_money(player,-price)
+
 		
 		//потребляем бонус
 		if (any_city_bonus)
@@ -5383,6 +5212,32 @@ common={
 				game_msgs.add('Вы купили '+['','город','дом','дом','дом','дом','отель'][cell.level] +' ('+ cell.rus_name +')')
 		}
 
+	},
+
+	get_total_capital(player){
+	
+		let total_capital=0
+		for (const cell of cells_data){
+			
+			if (cell.owner===player){
+				total_capital+=cell.price
+				total_capital+=(cell.house_cost*(cell.level-1))
+			}	
+		}
+		
+		if (player===1)
+			total_capital+=my_data.money
+		else
+			total_capital+=opp_data.money
+		
+		return total_capital
+	},
+	
+	update_total_capital(){
+		
+		objects.my_total_capital.text=this.get_total_capital(1) + '$'
+		objects.opp_total_capital.text=this.get_total_capital(2) + '$'
+		
 	},
 
 	sell(player,cell){
@@ -5434,7 +5289,6 @@ common={
 		objects.roll_dice_btn.visible=false
 		objects.auc_cont.visible=false
 		objects.cell_info_cont.visible=false
-		objects.plans_cont.visible=false
 		objects.exch_cont.visible=false
 				
 		anim3.add(objects.game_btns_cont,{y:[objects.game_btns_cont.y,800,'linear']}, false, 0.3)				
@@ -6945,8 +6799,6 @@ main_loader={
 		loader.add('chip_go',git_src+'sounds/chip_go.mp3')
 		loader.add('monopoly',git_src+'sounds/monopoly.mp3')
 		loader.add('auc',git_src+'sounds/auc.mp3')
-		loader.add('plans_popup',git_src+'sounds/plans_popup.mp3')
-		loader.add('plans_click',git_src+'sounds/plans_click.mp3')
 		loader.add('city_dlg',git_src+'sounds/city_dlg.mp3')
 		loader.add('roll_btn',git_src+'sounds/roll_btn.mp3')
 		loader.add('casino_roll',git_src+'sounds/casino_roll.mp3')
