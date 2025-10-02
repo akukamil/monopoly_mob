@@ -3456,7 +3456,6 @@ casino={
 
 	stop(){
 
-
 		clearInterval(this.roll_sound_timer)
 		clearInterval(this.roll_rimer)
 		const result=irnd(0,5)
@@ -4028,16 +4027,18 @@ online_game={
 		this.on=0;
 
 		const res_array = [
-			['my_win',WIN , ['Соперник банкрот!','You win!']],
-			['my_timeout',LOSE , ['Вы проиграли! У вас закончилось время','You lose! You out of time']],
+			['opp_giveup',WIN , ['Соперник банкрот!','You win!']],
+			['my_giveup',LOSE , ['Вы банкрот!','You lose!']],
+			['my_win',WIN , ['Вы выиграли! Ваш капитал больше чем у соперника на более 2000$','You win!']],
+			['opp_win',LOSE , ['Вы проиграли! Ваш капитал меншье чем у соперника на более 2000$','You lose!']],
+			['my_timeout',LOSE , ['Вы проиграли! Разница капиталов более 2000$','You lose! You lose']],
 			['my_no_sync',NOSYNC , ['Похоже вы не захотели начинать игру.','It looks like you did not want to start the game']],
 			['opp_no_sync',NOSYNC , ['Похоже соперник не смог начать игру.','It looks like the opponent could not start the game']],
 			['opp_timeout',WIN , ['У соперника закончилось время','You win! Opponent out of time']],
 			['my_giveup',LOSE , ['Вы банкрот!','You lose!']],
 			['opp_giveup',WIN , ['Соперник банкрот!','You win!']],
 			['timer_error',LOSE , ['Ошибка таймера!','Timer error!']],
-			['my_no_connection',LOSE , ['Потеря связи!','Connection error!']],
-			['opp_win',WIN , ['Вы банкрот!','You lose!']],
+			['my_no_connection',LOSE , ['Потеря связи!','Connection error!']],			
 			['draw',DRAW , ['Ничья!','You lose!']],
 			['my_stop',DRAW , ['Вы отменили игру.','You canceled the game']]
 		];
@@ -4255,7 +4256,7 @@ bot_game={
 			scheduler.add(()=>{common.sell(2,cell_to_sell)},1000)
 			scheduler.add(()=>{this.try_sell_some()},2000)
 		}else{
-			common.stop('my_win')
+			common.stop('opp_giveup')
 		}
 
 	},
@@ -4268,7 +4269,7 @@ bot_game={
 		}
 		
 		this.clear()
-		common.stop('my_stop')
+		common.stop('my_giveup')
 		
 	},
 	
@@ -4277,8 +4278,10 @@ bot_game={
 		this.on=0
 
 		const res_array = [
-			['my_win',WIN , ['Вы выиграли!','You win!']],
-			['opp_win',WIN , ['Вы проиграли!','You lose!']],
+			['opp_giveup',WIN , ['Соперник банкрот!','You win!']],
+			['my_giveup',LOSE , ['Вы банкрот!','You lose!']],
+			['my_win',WIN , ['Вы выиграли! Ваш капитал больше чем у соперника на более 2000$','You win!']],
+			['opp_win',LOSE , ['Вы проиграли! Ваш капитал меншье чем у соперника на более 2000$','You lose!']],
 			['my_stop',DRAW , ['Играйте с реальным соперником для получения рейтинга!','You canceled the game']]
 		];
 
@@ -4493,6 +4496,7 @@ common={
 		//начальный баланс
 		this.set_money(1,START_CAPITAL)
 		this.set_money(2,START_CAPITAL)
+		this.update_total_capital()
 		
 		sound.play('game_start')
 		
@@ -5109,8 +5113,7 @@ common={
 			opp_data.money=amount
 			objects.opp_card_money.text=opp_data.money+'$'
 		}
-	
-		this.update_total_capital()
+		
 	},
 
 	place_chip(chip, cell_id){
@@ -5235,8 +5238,18 @@ common={
 	
 	update_total_capital(){
 		
-		objects.my_total_capital.text=this.get_total_capital(1) + '$'
-		objects.opp_total_capital.text=this.get_total_capital(2) + '$'
+		
+		const my_capital=this.get_total_capital(1)
+		const opp_capital=this.get_total_capital(2)
+		
+		objects.my_total_capital.text=my_capital + '$'
+		objects.opp_total_capital.text=opp_capital + '$'
+		
+		if (my_capital-opp_capital>2000)
+			this.stop('my_win')		
+		
+		if (opp_capital-my_capital>2000)
+			this.stop('opp_win')		
 		
 	},
 
