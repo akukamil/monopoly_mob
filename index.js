@@ -4035,8 +4035,6 @@ online_game={
 			['my_no_sync',NOSYNC , ['Похоже вы не захотели начинать игру.','It looks like you did not want to start the game']],
 			['opp_no_sync',NOSYNC , ['Похоже соперник не смог начать игру.','It looks like the opponent could not start the game']],
 			['opp_timeout',WIN , ['У соперника закончилось время','You win! Opponent out of time']],
-			['my_giveup',LOSE , ['Вы банкрот!','You lose!']],
-			['opp_giveup',WIN , ['Соперник банкрот!','You win!']],
 			['timer_error',LOSE , ['Ошибка таймера!','Timer error!']],
 			['my_no_connection',LOSE , ['Потеря связи!','Connection error!']],			
 			['draw',DRAW , ['Ничья!','You lose!']],
