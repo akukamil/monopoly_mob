@@ -5265,14 +5265,14 @@ common={
 		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
 
 		if(!cell.level) cell.owner=0
-
+		timer.start()
 		const price=Math.round((cell.level>1?cell.house_cost:cell.price)*0.5)
 		this.change_money(player,price)
 
 		//обновляем всю страну так как там тоже могло поменяться
 		this.update_view(cell)
 		
-		timer.start()
+
 		
 	},
 	
