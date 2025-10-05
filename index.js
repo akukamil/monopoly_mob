@@ -5080,7 +5080,7 @@ common={
 			opp_data.money+=amount
 			objects.opp_card_money.text=opp_data.money+'$'
 		}
-	
+		
 		this.update_total_capital()
 	
 	},
@@ -5227,6 +5227,8 @@ common={
 		
 		objects.my_total_capital.text=my_capital + '$'
 		objects.opp_total_capital.text=opp_capital + '$'
+		
+		if (this.move_on) return
 		
 		if (my_capital-opp_capital>2000)
 			this.stop('my_win')		
