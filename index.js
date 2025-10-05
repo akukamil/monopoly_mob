@@ -2582,7 +2582,7 @@ dice={
 			this.roll_timer=0
 			this.roll_timer2=0
 			this.roll_on=0
-		},2000)
+		},1000)
 
 	},
 	
@@ -4763,7 +4763,7 @@ common={
 			const tx=tar_cell.x+chip_anchors[next_cell_id].dx*shift
 			const ty=tar_cell.y+chip_anchors[next_cell_id].dy*shift
 
-			await anim3.add(chip,{x:[cx, tx,'linear'],y:[cy, ty,'linear']}, true, 0.15);
+			await anim3.add(chip,{x:[cx, tx,'linear'],y:[cy, ty,'linear']}, true, 0.075)
 
 			cur_cell_id=next_cell_id
 
