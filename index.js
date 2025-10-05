@@ -2582,7 +2582,7 @@ dice={
 			this.roll_timer=0
 			this.roll_timer2=0
 			this.roll_on=0
-		},1500)
+		},1000)
 
 	},
 	
