@@ -4943,17 +4943,17 @@ common={
 				}
 			}
 			if (move_data.result===3){
-				sys_msg.add('Соперник может выкупить ваш город')
+				game_msgs.add('Соперник может выкупить ваш город')
 				sound.play('bonus')
 				this.add_bonus('buy_opp_city_bonus',2)
 			}			
 			if (move_data.result===4){
-				sys_msg.add('Соперник может купить любой город')
+				game_msgs.add('Соперник может купить любой город')
 				sound.play('bonus')
 				this.add_bonus('buy_any_city_bonus',2)
 			}
 			if (move_data.result===5){
-				sys_msg.add('Соперник не платит ренту 3 хода!')
+				game_msgs.add('Соперник не платит ренту 3 хода!')
 				sound.play('norent')
 				common.opp_no_rent_bonus=3
 			}
