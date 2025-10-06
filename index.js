@@ -4911,6 +4911,7 @@ common={
 
 		if (move_data.type==='casino_accept'){
 			sys_msg.add('Соперник играет в казино...')
+			sound.play('casino')
 			if(move_data.pay_to_play)
 				common.change_money(2,-CASINO_PRICE_TO_PAY)
 		}
