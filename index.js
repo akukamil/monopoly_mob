@@ -787,7 +787,7 @@ req_dialog={
 		if (objects.req_cont.ready===false || objects.req_cont.visible===false)
 			return;
 
-		sound.play('close_it');
+		sound.play('click')
 
 		anim3.add(objects.req_cont,{alpha:[1, 0,'linear'],scale_xy:[1,0,'easeInBack']}, false, 0.5);
 
@@ -800,6 +800,8 @@ req_dialog={
 			sound.play('locked');
 			return;
 		}
+		
+		sound.play('click')
 
 		//устанавливаем окончательные данные оппонента
 		opp_data = req_dialog._opp_data;
