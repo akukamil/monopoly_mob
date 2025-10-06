@@ -5015,7 +5015,7 @@ common={
 
 		sound.play('roll_btn')
 		
-		anim3.add(objects.action_btn_hl,{scale_xy:[0.666,2,'linear'],alpha:[1,0,'linear']}, true, 0.75)
+		anim3.add(objects.action_btn_hl,{scale_xy:[0.666,2,'linear'],alpha:[1,0,'linear']}, true, 0.75,false)
 		anim3.add(objects.roll_dice_btn,{scale_xy:[0.3, 0.666,'easeOutBack']}, true, 0.25);
 		objects.roll_dice_btn.tint=objects.roll_dice_btn.base_tint
 		
@@ -5025,7 +5025,7 @@ common={
 	
 	show_done_btn(){
 		
-		anim3.add(objects.action_btn_hl,{scale_xy:[0.666,2,'linear'],alpha:[1,0,'linear']}, true, 0.75)
+		anim3.add(objects.action_btn_hl,{scale_xy:[0.666,2,'linear'],alpha:[1,0,'linear']}, true, 0.75,false)
 		anim3.add(objects.end_turn_btn,{scale_xy:[0.3,0.666,'easeOutBack'],alpha:[0,1,'linear']}, true, 0.15)
 		
 	},
