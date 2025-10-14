@@ -2749,65 +2749,6 @@ city_dlg={
 		this.close()
 	},
 
-	place_buttons(num,comm1,comm2){
-
-		const btn1=objects.cell_info_btn1
-		const btn2=objects.cell_info_btn2
-		const btn1_t=objects.cell_info_btn1_t
-		const btn2_t=objects.cell_info_btn2_t
-
-		btn1.alpha=1
-		btn2.alpha=1
-		btn1_t.alpha=1
-		btn2_t.alpha=1
-
-
-		if (num===0){
-			btn1.visible=false
-			btn1_t.visible=false
-
-			btn2.visible=false
-			btn2_t.visible=false
-		}
-
-		if (num===1){
-
-			if (comm1==='buy')
-				btn2.pointerdown=function(){city_dlg.buy(1,this.cur_cell)}
-			else
-				btn2.pointerdown=function(){city_dlg.sell(1,this.cur_cell)}
-
-			btn1.visible=false
-			btn1_t.visible=false
-
-			btn2.visible=true
-			btn2_t.visible=true
-
-			//btn2.x=100
-			//btn2_t.x=185
-		}
-
-		if (num===2){
-
-			btn1.pointerdown=function(){city_dlg.sell()}
-			btn2.pointerdown=function(){city_dlg.buy()}
-
-			btn1.visible=true
-			btn1_t.visible=true
-
-			btn2.visible=true
-			btn2_t.visible=true
-
-			//btn1.x=20
-			//btn1_t.x=105
-
-			//btn2.x=180
-			//btn2_t.x=265
-		}
-
-
-	},
-
 	update(cell){
 
 		const id=cell.id
@@ -4140,32 +4081,6 @@ bot_game={
 		
 	},
 
-	try_upgrade_some_city(){
-
-		for (const cell of cells_data){
-
-			if (cell.type==='city'&&cell.owner===2){
-
-				const cur_country=cell.country
-				const cur_cities=cells_data.filter(d=>d.country===cur_country)
-				const min_level=Math.min(...cur_cities.map(c=>c.level))
-				const all_mine=cur_cities.every(c=>c.owner===2)
-				const next_level=cell.level+1
-				const price=cell.level>0?cell.house_cost:cell.price
-				const houses_available=next_level===6?1:common.houses_num
-				const can_upgrade=all_mine&&(next_level-min_level===1)&&opp_data.money>=price&&next_level<7&&houses_available
-				if (can_upgrade){
-					common.buy(2,cell)
-					return
-
-				}
-
-			}
-
-		}
-
-	},
-	
 	try_upgrade_cur_city(cell){
 
 		const cur_country=cell.country
@@ -4311,7 +4226,6 @@ bot_game={
 			if (opp_data.money<=0){
 				this.try_sell_some()
 			}else{
-				//scheduler.add(()=>{this.try_upgrade_some_city()},1000)
 				scheduler.add(()=>{common.opp_fin_move_event()},1500)
 			}
 		}
