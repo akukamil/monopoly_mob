@@ -2814,7 +2814,7 @@ city_dlg={
 		this.cur_cell=cell
 
 		//основные параметры
-		objects.cell_info_title.text=cell.rus_name														 
+		objects.cell_info_title.text=cell.rus_name
 
 		objects.cell_info_params.text='Только город\nГород и 1 дом\nГород и 2 дома\nГород и 3 дома\nГород и 4 дома\nГород и отель'
 		objects.cell_info_prices.text='$ '+cell.rent[1]+'\n$ '+cell.rent[2]+'\n$ '+cell.rent[3]+'\n$ '+cell.rent[4]+'\n$ '+cell.rent[5]+'\n$ '+cell.rent[6]
@@ -2823,8 +2823,9 @@ city_dlg={
 
 		//просто ссылки на кнопки
 		const btn1=objects.cell_info_btn1
-		const btn2=objects.cell_info_btn2
 		const btn1_t=objects.cell_info_btn1_t
+		
+		const btn2=objects.cell_info_btn2
 		const btn2_t=objects.cell_info_btn2_t
 
 		//показываем текущий уровень
@@ -2836,112 +2837,54 @@ city_dlg={
 		
 		//страну можно разрушить
 		const country=cells_data.filter(d=>d.country===cell.country)
-		const max_level_1=Math.max(...country.map(c=>c.level))===1
+		const is_my_county=country.every(d=>d.owner===1)
+		const country_not_built=country.every(d=>d.level<2)
+		
 		
 		let type=''
+		const can_buy_or_upgrade=((me_on_cell||common.buy_bonus)&&cell.owner===0) || ((me_on_cell||common.buy_bonus)&&cell.owner===1&&is_my_county&&cell.level<6)
+		const can_buy_out=common.buy_out_bonus&&cell.owner===2&&country_not_built
+		const can_sell=cell.owner===1
 		
-		if (!cell.owner&&me_on_cell)
-			type='ONLY_BUY'
-		
-		if (!cell.owner&&!me_on_cell&&common.buy_any_city_bonus)
-			type='ONLY_BUY_BONUS'
-		
-		if (cell.owner===1&&[1,2,3,4,5].includes(cell.level))
-			type='SELL_OR_BUY'
-		
-		if (cell.owner===1&&cell.level===6)
-			type='ONLY_SELL'
-		
-		if (cell.owner===2&&common.buy_opp_city_bonus&&max_level_1)
-			type='REBUY'
+	
+		btn1.visible=false
+		btn1_t.visible=false
+		btn2.visible=false
+		btn2_t.visible=false
 			
-		//покупка просто города
-		if (type==='ONLY_BUY'){
-			
-			btn1.visible=false
-			btn1_t.visible=false
+		//покупка или апгрейд
+		if (can_buy_or_upgrade){
 			
 			btn2.visible=true
 			btn2_t.visible=true
-			btn2_t.text=`КУПИТЬ ГОРОД\n-$${cell.price}`
-			btn2.pointerdown=function(){city_dlg.buy_btn_down()}
+			if (cell.level===5)
+				btn2_t.text=`КУПИТЬ ОТЕЛЬ\n-$${cell.house_cost}`
+			if ([1,2,3,4].includes(cell.level))
+				btn2_t.text=`КУПИТЬ ДОМ\n-$${cell.house_cost}`
+			if (cell.level===0)
+				btn2_t.text=`КУПИТЬ ГОРОД\n-$${cell.price}`
+			btn2.pointerdown=function(){city_dlg.buy_btn_down(!me_on_cell)}
 		}
 		
-		//покупка просто города
-		if (type==='ONLY_BUY_BONUS'){
-			
-			btn1.visible=false
-			btn1_t.visible=false
-			
-			btn2.visible=true
-			btn2_t.visible=true
-			btn2_t.text=`КУПИТЬ ГОРОД\n-$${cell.price}`
-			btn2.pointerdown=function(){city_dlg.buy_btn_down(1)}
-		}
-		
-		//перекуп просто города
-		if (type==='REBUY'){
-			
-			btn1.visible=false
-			btn1_t.visible=false
+		//выкуп
+		if (can_buy_out){
 			
 			btn2.visible=true
 			btn2_t.visible=true
 			btn2_t.text=`ВЫКУПИТЬ\n-$${cell.price}`
 			btn2.pointerdown=function(){city_dlg.rebuy_btn_down()}
-		 
 		}
 		
-		//продажа оттеля
-		if (type==='ONLY_SELL'){
-			
-			btn1.visible=false
-			btn1_t.visible=false
-			
-			btn2.visible=true
-			btn2_t.visible=true
-			btn2_t.text=`ПРОДАТЬ ОТЕЛЬ\n+${Math.round(cell.house_cost*0.5)}$`
-			btn2.pointerdown=function(){city_dlg.sell_btn_down()}
-		}
-		
-		//покупка или продажа
-		if (type==='SELL_OR_BUY'){
+		//продажа
+		if (can_sell){
 			
 			btn1.visible=true
 			btn1_t.visible=true
-			btn2.visible=true
-			btn2_t.visible=true
-		
+			btn1_t.text=`ПРОДАТЬ\n+${Math.round(cell.house_cost*0.5)}$`
 			btn1.pointerdown=function(){city_dlg.sell_btn_down()}
-			btn2.pointerdown=function(){city_dlg.buy_btn_down()}
-
-			if (cell.level===1){
-									  
-				btn1_t.text=`ПРОДАТЬ ГОРОД\n+${Math.round(cell.price*0.5)}$`
-				btn2_t.text=`КУПИТЬ ДОМ\n-${Math.round(cell.house_cost)}$`
-			}
-
-			if ([2,3,4].includes(cell.level)){
-									  
-				btn1_t.text=`ПРОДАТЬ ДОМ\n+${Math.round(cell.house_cost*0.5)}$`
-				btn2_t.text=`КУПИТЬ ДОМ\n-${Math.round(cell.house_cost)}$`
-			}
-
-			if (cell.level===5){
-									  
-				btn1_t.text=`ПРОДАТЬ ДОМ\n+${Math.round(cell.house_cost*0.5)}$`
-				btn2_t.text=`КУПИТЬ ОТЕЛЬ\n-${Math.round(cell.house_cost)}$`
-			}
-
 		}
 		
-		if(type===''){
-			
-			btn1.visible=false
-			btn1_t.visible=false
-			btn2.visible=false
-			btn2_t.visible=false
-		}
+	
 	},
 			
 	show(cell){
@@ -2953,17 +2896,24 @@ city_dlg={
 		sound.play('city_dlg')
 	},
 
-	buy_btn_down(any_city_bonus){
+	buy_btn_down(buy_bonus){
 
 		const check_buy_res=this.check_buy()
 
 		if (check_buy_res==='not_all_mine'){
 			sys_msg.add('Нужно купить все города!')
+			sound.play('decline')
 			return
 		}
 
-		if (check_buy_res==='not_all_complete'){
+		/*if (check_buy_res==='not_all_complete'){
 			sys_msg.add('Нужно строить последо вательно!')
+			return
+		}*/
+		
+		if (common.buy_action_made===1){
+			sys_msg.add('Больше покупать нельзя!')
+			sound.play('decline')
 			return
 		}
 
@@ -2978,10 +2928,11 @@ city_dlg={
 			return
 		}
 
-		common.buy(1,this.cur_cell,0,any_city_bonus)
+		common.buy(1,this.cur_cell,0,buy_bonus)
+		common.buy_action_made=1
 
 		//отправляем сопернику
-		opponent.send({s:my_data.uid,type:'buy',cell_id:this.cur_cell.id,b:any_city_bonus?1:0,tm:Date.now()})
+		opponent.send({s:my_data.uid,type:'buy',cell_id:this.cur_cell.id,b:buy_bonus?1:0,tm:Date.now()})
 
 		this.update(this.cur_cell)
 		this.close()
@@ -3014,12 +2965,14 @@ city_dlg={
 		const new_level=this.cur_cell.level-1
 		if (max_level-new_level>1){
 			sys_msg.add('продавайте последовательно!')
+			sound.play('decline')
 			return
 		}
 
 		//если продаем отель - проверка что есть дома в банке
 		if (this.cur_cell.level===6&&common.houses_num<4){
 			sys_msg.add('В банке нет домов для размена!')
+			sound.play('decline')
 			return
 		}
 
@@ -3096,6 +3049,7 @@ fin={
 		objects.auc_cont.visible=false
 		objects.cell_info_cont.visible=false
 		objects.exch_cont.visible=false
+		objects.casino_cont.visible=false
 		
 		anim3.add(objects.end_turn_btn,{scale_xy:[0.666,0.2,'easeInBack'],alpha:[1,0,'linear']}, false, 0.15);
 	}
@@ -3474,12 +3428,12 @@ casino={
 		if (result===3){
 			game_msgs.add('Вы можете выкупить пустой город соперника!')
 			sound.play('bonus')
-			common.add_bonus('buy_opp_city_bonus',1)
+			common.add_bonus('buy_out_bonus',1)
 		}
 		if (result===4){
-			game_msgs.add('Вы можете купить любой город!')
+			game_msgs.add('Вы можете купить или улучшить любой город!')
 			sound.play('bonus')
-			common.add_bonus('buy_any_city_bonus',1)
+			common.add_bonus('buy_bonus',1)
 		}
 		if (result===5){
 			game_msgs.add('Вы не платите ренту 3 хода!')
@@ -4211,6 +4165,24 @@ bot_game={
 		}
 
 	},
+	
+	try_upgrade_cur_city(cell){
+
+		const cur_country=cell.country
+		const cur_cities=cells_data.filter(d=>d.country===cur_country)
+		//const min_level=Math.min(...cur_cities.map(c=>c.level))
+		const all_mine=cur_cities.every(c=>c.owner===2)
+		const next_level=cell.level+1
+		const price=cell.level>0?cell.house_cost:cell.price
+		const houses_available=next_level===6?1:common.houses_num
+		const can_upgrade=all_mine&&opp_data.money>=price&&next_level<7&&houses_available
+		if (can_upgrade){
+			common.buy(2,cell)
+			return
+
+		}
+
+	},
 
 	try_sell_some(){
 
@@ -4311,11 +4283,9 @@ bot_game={
 				if (cell.type==='city'){
 					if (opp_data.money>cell.price){
 						scheduler.add(()=>{common.buy(2,cell)},1000)
-						scheduler.add(()=>{this.try_upgrade_some_city()},1500)
-						scheduler.add(()=>{common.opp_fin_move_event()},2000)
-					}else{
-						scheduler.add(()=>{this.try_upgrade_some_city()},1000)
 						scheduler.add(()=>{common.opp_fin_move_event()},1500)
+					}else{
+						scheduler.add(()=>{common.opp_fin_move_event()},1000)
 					}
 				}
 			}
@@ -4323,35 +4293,48 @@ bot_game={
 
 		//город бота, просто завершаем
 		if (cell.owner===2){
-			scheduler.add(()=>{this.try_upgrade_some_city()},1000)
-			scheduler.add(()=>{common.opp_fin_move_event()},2000)
+
+			//пробуем играть в казино так как денег много
+			if (opp_data.money>500&&Math.random()>0.75){
+				common.process_opp_move({type:'casino_accept'})
+				scheduler.add(()=>{this.play_casino()},2000)
+				scheduler.add(()=>{common.opp_fin_move_event()},3000)
+			}else{
+				scheduler.add(()=>{this.try_upgrade_cur_city(cell)},1000)
+				scheduler.add(()=>{common.opp_fin_move_event()},1500)
+			}			
+			
 		}
 
 		//город игрока, просто завершаем (рента оплачена)
 		if (cell.owner===1){
-
 			if (opp_data.money<=0){
 				this.try_sell_some()
 			}else{
-				scheduler.add(()=>{this.try_upgrade_some_city()},1000)
-				scheduler.add(()=>{common.opp_fin_move_event()},2000)
+				//scheduler.add(()=>{this.try_upgrade_some_city()},1000)
+				scheduler.add(()=>{common.opp_fin_move_event()},1500)
 			}
-
-
 		}
 
 		//стартовая фигура, просто завершаем
 		if (cell.id===0){
-			scheduler.add(()=>{this.try_upgrade_some_city()},1000)
-			scheduler.add(()=>{common.opp_fin_move_event()},2000)
+			
+			//пробуем играть в казино так как денег много
+			if (opp_data.money>500){
+				common.process_opp_move({type:'casino_accept'})
+				scheduler.add(()=>{this.play_casino()},2000)
+				scheduler.add(()=>{common.opp_fin_move_event()},3000)
+			}else{
+				scheduler.add(()=>{common.opp_fin_move_event()},1000)
+			}	
+			
 		}
 
 		//казино
 		if (cell.type==='casino'){			
 			common.process_opp_move({type:'casino_accept'})
 			scheduler.add(()=>{this.play_casino()},2000)
-			scheduler.add(()=>{this.try_upgrade_some_city()},3000)
-			scheduler.add(()=>{common.opp_fin_move_event()},3500)
+			scheduler.add(()=>{common.opp_fin_move_event()},3000)
 		}
 	
 
@@ -4426,8 +4409,9 @@ common={
 
 	on:0,
 	houses_num:30,
-	buy_any_city_bonus:0,
-	buy_opp_city_bonus:0,
+	buy_bonus:0,
+	buy_out_bonus:0,
+	buy_action_made:0,
 	chip_sound_timer:0,
 	my_no_rent_bonus:0,
 	opp_no_rent_bonus:0,
@@ -4515,9 +4499,9 @@ common={
 		this[bonus]=0
 		
 		if (player===1){
-			objects.my_shop_cart.visible=(this.buy_any_city_bonus||this.buy_any_city_bonus)?true:false
+			objects.my_shop_cart.visible=(this.buy_bonus||this.buy_bonus)?true:false
 		}else
-			objects.opp_shop_cart.visible=(opp_data.buy_any_city_bonus||opp_data.buy_any_city_bonus)?true:false
+			objects.opp_shop_cart.visible=(opp_data.buy_bonus||opp_data.buy_bonus)?true:false
 		
 	},
 	
@@ -4869,7 +4853,12 @@ common={
 
 		//завершение хода
 		if (cur_player===1){
-			//objects.roll_dice_btn.visible=false			
+			if (cell.type==='city'&&!cell.auc){
+				const country=cells_data.filter(d=>d.country===cell.country)
+				const is_my_county=country.every(d=>d.owner===1)
+				if (is_my_county)
+					city_dlg.show(cell)
+			}				
 		}
 
 
@@ -4947,12 +4936,12 @@ common={
 			if (move_data.result===3){
 				game_msgs.add('Соперник может выкупить ваш город')
 				sound.play('bonus')
-				this.add_bonus('buy_opp_city_bonus',2)
+				this.add_bonus('buy_out_bonus',2)
 			}			
 			if (move_data.result===4){
 				game_msgs.add('Соперник может купить любой город')
 				sound.play('bonus')
-				this.add_bonus('buy_any_city_bonus',2)
+				this.add_bonus('buy_bonus',2)
 			}
 			if (move_data.result===5){
 				game_msgs.add('Соперник не платит ренту 3 хода!')
@@ -4979,40 +4968,6 @@ common={
 
 	},
 
-	opp_activated_plan(data){
-		//активация плана
-
-		if (data.id===-1){
-			this.change_money(2,-50)
-			game_msgs.add('Соперник доработал план!')
-		}
-
-		
-		if (data.id===0){
-
-			const city_cell=cells_data[data.city_id]
-			const city_name=city_cell.rus_name
-			common.capture_empty_city(city_cell)
-			game_msgs.add('Соперник реализовал план ВОЙНА и захватил Ваш город ('+city_name+')')
-		}
-
-		if (data.id===1){
-			common.set_money(1,-300)
-			game_msgs.add('Соперник достигли цели КРАЖА, ваш баланс -300$')
-		}
-
-		if (data.id===2){
-			common.change_money(2,2000)
-			game_msgs.add('Соперник достигл цели НАСЛЕДСТВО и получил 2000$')
-		}
-
-		if (data.id===100){
-			common.change_money(2,100)
-			game_msgs.add('Соперник забрал 100 $ вместо достижения цели')
-		}
-
-	},
-
 	opp_fin_move_event(){
 
 		sound.play('roll_btn')
@@ -5020,6 +4975,10 @@ common={
 		anim3.add(objects.action_btn_hl,{scale_xy:[0.666,2,'linear'],alpha:[1,0,'linear']}, true, 0.75,false)
 		anim3.add(objects.roll_dice_btn,{scale_xy:[0.3, 0.666,'easeOutBack']}, true, 0.25);
 		objects.roll_dice_btn.tint=objects.roll_dice_btn.base_tint
+		
+		//теперь мой ход
+		this.buy_action_made=0
+		
 		
 		my_turn=1
 		timer.start()
@@ -5135,7 +5094,7 @@ common={
 		this.change_money(player,-cell.price)
 		
 		//потребляем бонус
-		this.consume_bonus('buy_opp_city_bonus',player)
+		this.consume_bonus('buy_out_bonus',player)
 		
 		//обновляем всю страну так как там тоже могло поменяться
 		this.update_view(cell)
@@ -5154,7 +5113,7 @@ common={
 		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.2,'ease2back']}, true, 0.6)
 	},
 	
-	buy(player,cell,prc,any_city_bonus){
+	buy(player,cell,prc,buy_bonus){
 
 
 		if (cell.type!=='city') return
@@ -5162,13 +5121,12 @@ common={
 		const price=prc||(cell.level>0?cell.house_cost:cell.price)
 		cell.owner=player
 		cell.level++
-		
+
 		this.change_money(player,-price)
 
-		
 		//потребляем бонус
-		if (any_city_bonus)
-			this.consume_bonus('buy_any_city_bonus',player)
+		if (buy_bonus)
+			this.consume_bonus('buy_bonus',player)
 		
 		//анимация
 		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
@@ -7173,7 +7131,7 @@ async function init_game_env(lang) {
 
 
 	//номер комнаты
-	room_name= 'states1';
+	room_name= 'states2';
 
 	//ждем загрузки чата
 	await Promise.race([
