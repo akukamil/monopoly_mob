@@ -3538,6 +3538,8 @@ casino={
 		
 		common.pay_casino_played=1
 		
+		objects.end_turn_btn.visible=false
+		
 		opponent.send({s:my_data.uid,type:'casino_accept',pay_to_play:this.pay_to_play,tm:Date.now()})
 
 		this.state='roll'
@@ -4018,7 +4020,7 @@ online_game={
 			['my_giveup',LOSE , ['Вы банкрот!','You lose!']],
 			['my_win',WIN , ['Вы выиграли! Ваш капитал больше чем у соперника на более 2000$','You win!']],
 			['opp_win',LOSE , ['Вы проиграли! Ваш капитал меншье чем у соперника на более 2000$','You lose!']],
-			['my_timeout',LOSE , ['Вы проиграли! Разница капиталов более 2000$','You lose! You lose']],
+			['my_timeout',LOSE , ['Вы проиграли! Закончилось время на ход!','You lose! You lose']],
 			['my_no_sync',NOSYNC , ['Похоже вы не захотели начинать игру.','It looks like you did not want to start the game']],
 			['opp_no_sync',NOSYNC , ['Похоже соперник не смог начать игру.','It looks like the opponent could not start the game']],
 			['opp_timeout',WIN , ['У соперника закончилось время','You win! Opponent out of time']],
