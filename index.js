@@ -3549,12 +3549,12 @@ casino={
 			}
 		}
 		if (result===3){
-			game_msgs.add('Вы можете выкупить пустой город соперника!')
+			game_msgs.add('Вы выиграли купон на выкуп города соперника!')
 			sound.play('bonus')
 			common.add_coupon('buy_out_coupons',1)
 		}
 		if (result===4){
-			game_msgs.add('Вы можете купить или улучшить другой город!')
+			game_msgs.add('Вы выиграли купон на покупку другого горда!')
 			sound.play('bonus')
 			common.add_coupon('buy_any_coupons',1)
 		}
@@ -7266,6 +7266,7 @@ async function init_game_env(lang) {
 		nick_tm:my_data.nick_tm,
 		avatar_tm:my_data.avatar_tm,
 		games:my_data.games,
+		coupons:my_data.coupons,
 		country:my_data.country||'',
 		tm:firebase.database.ServerValue.TIMESTAMP,
 		session_start:firebase.database.ServerValue.TIMESTAMP
