@@ -4580,6 +4580,8 @@ common={
 		dice.set_random()
 		game_msgs.activate()
 		
+		this.prepare_cells()
+		
 		//начальный баланс
 		this.set_money(1,START_CAPITAL)
 		this.set_money(2,START_CAPITAL)
@@ -4596,7 +4598,7 @@ common={
 		objects.opp_avatar.texture=players_cache.players[opp_data.uid].texture
 		objects.opp_shop_cart.visible=false
 		
-		this.prepare_cells()
+		
 
 	},
 	
