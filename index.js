@@ -2803,7 +2803,7 @@ city_dlg={
 			//если нужно задействовать купон
 			if (!me_on_cell){
 				objects.cell_info_coupon_icon.visible=true
-				objects.cell_info_coupon_icon.texture=assets.buy_any_coupon_icon
+				objects.cell_info_coupon_icon.texture=assets.coupon_0_icon
 			}
 
 			btn2.visible=true
@@ -2821,7 +2821,7 @@ city_dlg={
 		if (can_buy_out){
 			
 			objects.cell_info_coupon_icon.visible=true
-			objects.cell_info_coupon_icon.texture=assets.buy_out_coupon_icon
+			objects.cell_info_coupon_icon.texture=assets.coupon_1_icon
 			
 			btn2.visible=true
 			btn2_t.visible=true
@@ -2973,22 +2973,38 @@ coupons_dlg={
 			
 		sound.play('coupons_dlg')
 		
-		for (let i=0;i<4;i++)
-			objects.coupons_num[i].text='x'+my_data.coupons[i]
-
-		if (common.temp_coupons[0]){
-			objects.coupons_dlg_buy_any_coupons.visible=true
-			objects.coupons_dlg_buy_any_coupons.text='x'+common.temp_coupons[0]
+		for (let i=0;i<4;i++){
+			
+			if (common.temp_coupons[i]||my_data.coupons[i]){
+				
+				if (common.temp_coupons[i]){
+					objects.temp_coupons_num[i].alpha=1
+					objects.temp_coupons_num[i].text=common.temp_coupons[i]
+				}
+				
+				if (my_data.coupons[i]){
+					objects.coupons_num[i].alpha=1
+					objects.coupons_num[i].text=my_data.coupons[i]
+				}
+				
+				objects.coupons_icons[i].alpha=1
+				
+			}else{
+				
+				
+				objects.coupons_icons[i].alpha=0.3
+				
+				if (i<2){
+					objects.temp_coupons_num[i].alpha=0.3
+					objects.temp_coupons_num[i].text='0'
+				}
+				
+				objects.coupons_num[i].alpha=0.3
+				objects.coupons_num[i].text='0'
+			}
+			
+			
 		}
-		else
-			objects.coupons_dlg_buy_any_coupons.visible=false
-
-		if (common.temp_coupons[1]){
-			objects.coupons_dlg_buy_out_coupons.visible=true
-			objects.coupons_dlg_buy_out_coupons.text='x'+common.temp_coupons[1]
-		}
-		else
-			objects.coupons_dlg_buy_out_coupons.visible=false		
 
 		anim3.add(objects.coupons_dlg_cont,{alpha:[0, 1,'linear'],scale_xy:[1,1.1,'ease2back']}, true, 0.2);
 	},
@@ -4559,7 +4575,6 @@ common={
 		anim3.add(objects.my_card_cont,{x:[-200,objects.my_card_cont.sx,'linear'],alpha:[0,my_turn?1:0.5,'linear']}, true, 0.3)
 		objects.my_card_rating.text=my_data.rating;
 		objects.my_card_name.set2(my_data.name,160)
-		objects.my_shop_cart.visible=false
 		
 		this.on=1
 		
@@ -4583,7 +4598,6 @@ common={
 		objects.opp_card_name.set2(opp_data.name,160);
 		objects.opp_card_rating.text=opp_data.rating;
 		objects.opp_avatar.texture=players_cache.players[opp_data.uid].texture
-		objects.opp_shop_cart.visible=false
 		
 		
 
@@ -6833,7 +6847,7 @@ main_loader={
 		this.load_bar_mask=new PIXI.Graphics();
 		this.load_bar_mask.beginFill(0xff0000);
 		this.load_bar_mask.drawRect(0,0,1,40);
-		this.load_bar_mask.x=0;
+		this.load_bar_mask.x=20;
 		this.load_bar_mask.y=380;
 
 		const load_bar_progress=new PIXI.Sprite(assets.load_bar_progress);
