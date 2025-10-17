@@ -2976,16 +2976,16 @@ coupons_dlg={
 		for (let i=0;i<4;i++)
 			objects.coupons_num[i].text='x'+my_data.coupons[i]
 
-		if (common.buy_any_coupons){
+		if (common.temp_coupons[0]){
 			objects.coupons_dlg_buy_any_coupons.visible=true
-			objects.coupons_dlg_buy_any_coupons.text='x'+common.buy_any_coupons
+			objects.coupons_dlg_buy_any_coupons.text='x'+common.temp_coupons[0]
 		}
 		else
 			objects.coupons_dlg_buy_any_coupons.visible=false
 
-		if (common.buy_out_coupons){
+		if (common.temp_coupons[1]){
 			objects.coupons_dlg_buy_out_coupons.visible=true
-			objects.coupons_dlg_buy_out_coupons.text='x'+common.buy_out_coupons
+			objects.coupons_dlg_buy_out_coupons.text='x'+common.temp_coupons[1]
 		}
 		else
 			objects.coupons_dlg_buy_out_coupons.visible=false		
@@ -3038,7 +3038,7 @@ coupons_dlg={
 			game_msgs.add('Вы использовали купон на 100$')
 			common.change_money(1,100)
 			opponent.send({s:my_data.uid,type:'coupon',id:this.active_coupon_id,tm:Date.now()})
-			this.consume_coupon(this.active_coupon_id)
+			common.consume_coupon(this.active_coupon_id)
 			this.close()
 		}
 		
@@ -3062,7 +3062,7 @@ coupons_dlg={
 			game_msgs.add('Вы использовали купон для освобождения от ренты на 3 случая')
 			common.my_no_rent_bonus=3
 			opponent.send({s:my_data.uid,type:'coupon',id:this.active_coupon_id,tm:Date.now()})
-			this.consume_coupon(this.active_coupon_id)
+			common.consume_coupon(this.active_coupon_id)
 			this.close()
 		}
 		
@@ -3115,7 +3115,7 @@ coupons_dlg={
 		anim3.add(objects.coupons_dlg_cont,{scale_xy:[1,0.5,'easeInBack'],alpha:[1,0,'linear']}, false, 0.5)
 		
 	}
-		
+
 }
 
 fin={
@@ -3552,12 +3552,12 @@ casino={
 		if (result===3){
 			game_msgs.add('Вы выиграли купон на выкуп города соперника!')
 			sound.play('bonus')
-			common.add_coupon('buy_out_coupons',1)
+			common.add_temp_coupon(1)
 		}
 		if (result===4){
 			game_msgs.add('Вы выиграли купон на покупку другого горда!')
 			sound.play('bonus')
-			common.add_coupon('buy_any_coupons',1)
+			common.add_temp_coupon(0)
 		}
 		if (result===5){
 			game_msgs.add('Вы выиграли освобождение от ренты на 2 случая!')
@@ -3962,6 +3962,7 @@ online_game={
 		objects.chat_btn.visible=true
 		objects.stickers_btn.visible=true
 		objects.coupons_btn.visible=true
+		objects.coupons_btn_num.visible=true
 		objects.giveup_btn.visible=true
 		
 		
@@ -4061,28 +4062,7 @@ online_game={
 		common.exch_down()
 		
 	},
-	
-	coupons_btn_down(){
 		
-		if (anim3.any_on()||!this.on){
-			sound.play('locked');
-			return
-		}
-		
-		if(!my_turn){
-			sys_msg.add('Не ваша очередь!')
-			return
-		}
-
-		if(!my_turn_started){
-			sys_msg.add('Сначала нужно бросить кубики...')
-			return
-		}		
-		
-		coupons_dlg.activate()
-		
-	},
-	
 	calc_new_rating(old_rating, game_result) {
 
 		if (game_result === NOSYNC)
@@ -4207,7 +4187,8 @@ bot_game={
 		objects.exit_bot_btn.visible=true
 		objects.chat_btn.visible=false
 		objects.stickers_btn.visible=false
-		objects.coupons_btn.visible=false
+		objects.coupons_btn.visible=true
+		objects.coupons_btn_num.visible=true
 		objects.giveup_btn.visible=false
 		
 	
@@ -4535,6 +4516,7 @@ common={
 	chip_sound_timer:0,
 	my_no_rent_bonus:0,
 	opp_no_rent_bonus:0,
+	temp_coupons:[0,0],
 	perm_coupons_used:[0,0,0,0],
 	move_on:0,
 	pay_casino_played:0,
@@ -4565,7 +4547,8 @@ common={
 		this.opp_no_rent_bonus=0
 		this.buy_any_coupons=0
 		this.buy_out_coupons=0
-		this.perm_coupons_used=[0,0,0,0]
+		this.temp_coupons=[0,0]
+		this.perm_coupons_used=[0,0,0,0]		
 		
 		opponent.opp_conf_play=0
 		opponent.me_conf_play=0
@@ -4593,6 +4576,7 @@ common={
 		this.set_money(1,START_CAPITAL)
 		this.set_money(2,START_CAPITAL)
 		this.update_total_capital()
+		this.update_coupons_btn()
 		
 		sound.play('game_start')
 		
@@ -4609,27 +4593,21 @@ common={
 
 	},
 	
-	add_coupon(coupon){
+	add_temp_coupon(coupon_id){
 	
-		this[coupon]++
-
+		this.temp_coupons[coupon_id]++
+		this.update_coupons_btn()
 	},
 	
-	consume_coupon(coupon){
+	consume_coupon(coupon_id){
 
 		//если нету временных купонов то убираем из постоянных
-		if (this[coupon]===0){
-			
-			if (coupon==='buy_any_coupons')
-				coupons_dlg.consume_coupon(0)
-			
-			if (coupon==='buy_out_coupons')
-				coupons_dlg.consume_coupon(1)
-			
-			return
-		}
-			
-		this[coupon]--
+		if (!this.temp_coupons[coupon_id])
+			coupons_dlg.consume_coupon(coupon_id)
+		else
+			this.temp_coupons[coupon_id]--
+		
+		this.update_coupons_btn()
 
 	},
 	
@@ -5076,12 +5054,10 @@ common={
 			if (move_data.result===3){
 				game_msgs.add('Соперник может выкупить ваш город')
 				sound.play('bonus')
-				this.add_coupon('buy_out_coupons',2)
-			}			
+				}			
 			if (move_data.result===4){
 				game_msgs.add('Соперник может купить любой город')
 				sound.play('bonus')
-				this.add_coupon('buy_any_coupons',2)
 			}
 			if (move_data.result===5){
 				game_msgs.add('Соперник не платит ренту 2 раза!')
@@ -5237,13 +5213,40 @@ common={
 		
 	},
 	
+	coupons_btn_down(){
+		
+		if (anim3.any_on()||!this.on){
+			sound.play('locked');
+			return
+		}
+		
+		if(!my_turn){
+			sys_msg.add('Не ваша очередь!')
+			return
+		}
+
+		if(!my_turn_started){
+			sys_msg.add('Сначала нужно бросить кубики...')
+			return
+		}		
+		
+		coupons_dlg.activate()
+		
+	},
+	
+	update_coupons_btn(){
+		
+		objects.coupons_btn_num.text=my_data.coupons[0]+my_data.coupons[1]+my_data.coupons[2]+my_data.coupons[3]+this.temp_coupons[0]+this.temp_coupons[1]
+		
+	},
+	
 	buyout(player,cell){
 		
 		cell.owner=player
 		this.change_money(player,-cell.price)
 		
 		//потребляем купон
-		if (player===1) this.consume_coupon('buy_out_coupons')
+		if (player===1) this.consume_coupon(1)
 		
 		//обновляем всю страну так как там тоже могло поменяться
 		this.update_view(cell)
@@ -5274,7 +5277,7 @@ common={
 
 		//потребляем бонус
 		if (buy_any_coupons&&player===1)
-			this.consume_coupon('buy_any_coupons')
+			this.consume_coupon(1)
 		
 		//анимация
 		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
