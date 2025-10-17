@@ -2787,8 +2787,8 @@ city_dlg={
 		
 		
 		let type=''
-		const can_buy_or_upgrade=((me_on_cell||common.buy_any_coupons||my_data.coupons[0])&&cell.owner===0) || ((me_on_cell||common.buy_any_coupons||my_data.coupons[0])&&cell.owner===1&&is_my_county&&cell.level<6)
-		const can_buy_out=(common.buy_out_coupons||my_data.coupons[1])&&cell.owner===2&&country_not_built
+		const can_buy_or_upgrade=((me_on_cell||common.temp_coupons[0]||my_data.coupons[0])&&cell.owner===0) || ((me_on_cell||common.temp_coupons[0]||my_data.coupons[0])&&cell.owner===1&&is_my_county&&cell.level<6)
+		const can_buy_out=(common.temp_coupons[1]||my_data.coupons[1])&&cell.owner===2&&country_not_built
 		const can_sell=cell.owner===1
 	
 		btn1.visible=false
@@ -2878,7 +2878,7 @@ city_dlg={
 
 		//покупка за купоны
 		if (buy_any_coupons){
-			if (!common.buy_any_coupons&&common.perm_coupons_used[0]>=3){
+			if (!common.temp_coupons[0]&&common.perm_coupons_used[0]>=3){
 				sys_msg.add('Использование купона невозможно более 3 раз за игру!')
 				sound.play('decline')
 				return
@@ -2912,7 +2912,7 @@ city_dlg={
 			return
 		}
 
-		if (!common.buy_out_coupons&&common.perm_coupons_used[1]>=3){
+		if (!common.temp_coupons[1]&&common.perm_coupons_used[1]>=3){
 			sys_msg.add('Использование купона невозможно более 3 раз за игру!')
 			sound.play('decline')
 			return
@@ -4510,8 +4510,6 @@ common={
 
 	on:0,
 	houses_num:30,
-	buy_any_coupons:0,
-	buy_out_coupons:0,
 	buy_action_made:0,
 	chip_sound_timer:0,
 	my_no_rent_bonus:0,
@@ -4545,8 +4543,6 @@ common={
 		//бонусы не платить ренту
 		this.my_no_rent_bonus=0
 		this.opp_no_rent_bonus=0
-		this.buy_any_coupons=0
-		this.buy_out_coupons=0
 		this.temp_coupons=[0,0]
 		this.perm_coupons_used=[0,0,0,0]		
 		
@@ -5277,7 +5273,7 @@ common={
 
 		//потребляем бонус
 		if (buy_any_coupons&&player===1)
-			this.consume_coupon(1)
+			this.consume_coupon(0)
 		
 		//анимация
 		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
