@@ -2192,7 +2192,7 @@ pref={
 				this.update_coupons_info()
 				this.send_info('Куплено!')
 			}).catch((err) => {
-				message.add('Ошибка при покупке!');
+				this.send_info('Ошибка при покупке!');
 			});
 
 		};
