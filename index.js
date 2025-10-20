@@ -2183,7 +2183,7 @@ pref={
 	
 	shop_card_down(pack_id){
 		
-		if (game_platform==='VKtest') {
+		if (game_platform==='VK') {
 
 			vkBridge.send('VKWebAppShowOrderBox', { type: 'item', item: 'monopoly_pack'+pack_id}).then(data =>{
 				for (let i=0;i<4;i++)
