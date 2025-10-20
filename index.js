@@ -2464,7 +2464,8 @@ pref={
 
 			this.update_buttons()
 			
-			const my_card=objects.mini_cards.find(card=>card.uid===my_data.uid);
+			const my_card=objects.mini_cards.find(card=>card.uid===my_data.uid)
+			my_card.name=name
 			my_card.name_text.set2(name,125);
 			objects.pref_name.set2(name,230)
 			this.send_info('Вы изменили имя)))')
@@ -2514,7 +2515,7 @@ dr={
 	
 	activate(){
 		
-		objects.dr_cont.visible=true
+		anim3.add(objects.dr_cont,{alpha:[0, 1,'linear'],scale_xy:[1,1.1,'ease2back']}, true, 0.2);
 		this.bonuses_ids=[0,1,2]
 		this.bonuses_num=[1,1,1]
 		this.update()
@@ -2559,13 +2560,21 @@ dr={
 	
 	close_btn_down(){
 		
+		if(anim3.any_on()){
+			sound.play('locked');
+			return;
+		}
+
+		sound.play('click')
+		
 		this.close()
 		
 	},
 	
 	close(){
 		
-		objects.dr_cont.visible=false
+		anim3.add(objects.dr_cont,{scale_xy:[1,0.5,'easeInBack'],alpha:[1,0,'linear']}, false, 0.5)
+
 		
 	}
 	
