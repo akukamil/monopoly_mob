@@ -2498,7 +2498,7 @@ pref={
 		this.close()
 
 		//показываем лобби
-		anim3.add(objects.cards_cont,{x:[800,0,'linear']}, true, 0.4)
+		anim3.add(objects.cards_cont,{x:[450,0,'linear']}, true, 0.4)
 		anim3.add(objects.lobby_header_cont,{y:[-200,objects.lobby_header_cont.sy,'linear']}, true, 0.4)
 		anim3.add(objects.lobby_footer_cont,{y:[800,objects.lobby_footer_cont.sy,'linear']}, true, 0.4)
 
@@ -5782,8 +5782,8 @@ lobby={
 		anim3.add(objects.lobby_btn_hl,{alpha:[0,1,'ease3peaks']}, false, 0.25,false)
 
 		//убираем контейнер
-		anim3.add(objects.cards_cont,{x:[objects.cards_cont.x,800,'linear']}, false, 0.2)
-		anim3.add(objects.pref_cont,{x:[-800,objects.pref_cont.sx,'linear']}, true, 0.4)
+		anim3.add(objects.cards_cont,{x:[objects.cards_cont.x,450,'linear']}, false, 0.2)
+		anim3.add(objects.pref_cont,{x:[-450,objects.pref_cont.sx,'linear']}, true, 0.4)
 
 		//меняем футер
 		anim3.add(objects.lobby_header_cont,{y:[objects.lobby_header_cont.y,-100,'linear']}, false, 0.2)
