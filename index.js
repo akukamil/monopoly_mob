@@ -2513,12 +2513,51 @@ dr={
 	bonuses_num:[0,0,0],
 	bonuses_taken:[0,0,0],
 	
+	shuffle(arr){
+
+		let currentIndex = arr.length;
+
+		// While there remain elements to shuffle...
+		while (currentIndex != 0) {
+			// Pick a remaining element...
+			let randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex--;
+
+			// And swap it with the current element.
+			[arr[currentIndex], arr[randomIndex]] = [
+			arr[randomIndex], arr[currentIndex]];
+		}
+		return arr
+	},
+	
+	async check(update_tm){
+		
+		if (update_tm)
+			SERVER_TM=await my_ws.get_tms()||SERVER_TM
+		
+		const prv_tm=safe_ls('monopoly_prv_dr_tm')
+		
+		const prv_day_totals=Math.floor(prv_tm / (1000 * 60 * 60 * 24))
+		const cur_day_totals=Math.floor(SERVER_TM / (1000 * 60 * 60 * 24))
+		
+		safe_ls('monopoly_prv_dr_tm',SERVER_TM)
+
+		if ((cur_day_totals-prv_day_totals)===1)
+			this.activate()
+		
+		//повторно проверяем через некоторое время
+		setTimeout(()=>{
+			this.check(1)
+		},300000)
+	},
+	
 	activate(){
 		
-		anim3.add(objects.dr_cont,{alpha:[0, 1,'linear'],scale_xy:[1,1.1,'ease2back']}, true, 0.2);
-		this.bonuses_ids=[0,1,2]
-		this.bonuses_num=[1,1,1]
+		anim3.add(objects.dr_cont,{alpha:[0, 1,'linear'],angle:[0,5,'ease2back'],scale_xy:[1,1.1,'ease2back']}, true, 1);
+		this.bonuses_ids=this.shuffle([0,1,2,3])
+		this.bonuses_num=[irnd(1,2),irnd(1,2),irnd(1,2)]
 		this.update()
+		sound.play('dr_dlg')
 
 		
 	},
@@ -2535,16 +2574,14 @@ dr={
 		
 	},
 	
-	take_btn_down(id){
-		
-		
+	take_btn_down(id){		
 		
 		if (this.bonuses_taken[id]){
 			sound.play('decline')
 			return
 		}
 		
-		sound.play('click')
+		sound.play('dr')
 		
 		objects.dr_btns[id].alpha=0.4
 		objects.dr_nums[id].alpha=0.4
@@ -5213,21 +5250,7 @@ common={
 		anim3.add(objects.cells[city_cell.id],{scale_xy:[1,1.1,'ease2back']}, true, 0.6)
 		
 	},
-	
-	capture_empty_city(cell){
 		
-		//меняем владельца горда
-		sound.play('capture_city')
-		cell.owner=3-cell.owner
-		this.update_view(cell)		
-		
-		//проверяем монополию для звука и подстветки всей монополии
-		this.check_monopoly_and_flash(cell)
-	
-		//анимация
-		anim3.add(objects.cells[cell.id],{scale_xy:[1,1.2,'ease2back']}, true, 0.6)
-	},
-	
 	change_money(player,amount){
 
 		sound.play('money')
@@ -6976,10 +6999,9 @@ main_loader={
 		loader.add('click',git_src+'sounds/click.mp3')
 		loader.add('auc_bid',git_src+'sounds/auc_bid.mp3')
 		loader.add('auc_change',git_src+'sounds/auc_change.mp3')
-		loader.add('achivement',git_src+'sounds/achivement.mp3')
+		loader.add('dr',git_src+'sounds/dr.mp3')
 		loader.add('bonus',git_src+'sounds/bonus.mp3')
 		loader.add('money',git_src+'sounds/money.mp3')
-		loader.add('capture_city',git_src+'sounds/capture_city.mp3')
 		loader.add('hotel_buy',git_src+'sounds/hotel_buy.mp3')
 		loader.add('city_lost',git_src+'sounds/city_lost.mp3')
 		loader.add('dice',git_src+'sounds/dice.mp3')
@@ -7001,13 +7023,13 @@ main_loader={
 		loader.add('game_start',git_src+'sounds/game_start.mp3')
 		loader.add('coupons_dlg',git_src+'sounds/coupons_dlg.mp3')
 		loader.add('coupons_dlg_accepted',git_src+'sounds/coupons_dlg_accepted.mp3')
-		loader.add('coupons_dlg_decline',git_src+'sounds/coupons_dlg_decline.mp3')
 		loader.add('coupons_dlg_select',git_src+'sounds/coupons_dlg_select.mp3')
 		loader.add('coupon_used',git_src+'sounds/coupon_used.mp3')
 		loader.add('clock',git_src+'sounds/clock.mp3')
 		loader.add('music',git_src+'sounds/music2.mp3')
 		loader.add('confirm_dialog',git_src+'sounds/confirm_dialog.mp3')
 		loader.add('keypress',git_src+'sounds/keypress.mp3')
+		loader.add('dr_dlg',git_src+'sounds/dr_dlg.mp3')
 
 		//прогресс
 		loader.onProgress.add((l,res)=>{
@@ -7372,6 +7394,9 @@ async function init_game_env(lang) {
 	client_id = irnd(10,999999)
 	
 	SERVER_TM=await my_ws.get_tms() 
+	
+	//проверка ежедневного бонуса
+	dr.check()
 
 	//устанавливаем мой статус в онлайн
 	set_state({state:'o'});
