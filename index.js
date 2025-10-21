@@ -2535,7 +2535,7 @@ dr={
 		if (update_tm)
 			SERVER_TM=await my_ws.get_tms()||SERVER_TM
 		
-		const prv_tm=safe_ls('monopoly_prv_dr_tm')
+		const prv_tm=safe_ls('monopoly_prv_dr_tm')||0
 		
 		const prv_day_totals=Math.floor(prv_tm / (1000 * 60 * 60 * 24))
 		const cur_day_totals=Math.floor(SERVER_TM / (1000 * 60 * 60 * 24))
