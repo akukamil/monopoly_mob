@@ -7035,7 +7035,6 @@ main_loader={
 		loader.add('win',git_src+'sounds/win.mp3')
 		loader.add('game_start',git_src+'sounds/game_start.mp3')
 		loader.add('coupons_dlg',git_src+'sounds/coupons_dlg.mp3')
-		loader.add('coupons_dlg_accepted',git_src+'sounds/coupons_dlg_accepted.mp3')
 		loader.add('coupons_dlg_select',git_src+'sounds/coupons_dlg_select.mp3')
 		loader.add('coupon_used',git_src+'sounds/coupon_used.mp3')
 		loader.add('clock',git_src+'sounds/clock.mp3')
