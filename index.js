@@ -3617,7 +3617,7 @@ casino={
 	roll_on:0,
 	state:'',
 	roll_sound_timer:0,
-	roll_rimer:0,
+	roll_timer:0,
 	pay_to_play:0,
 
 	activate(pay_to_play){
@@ -3662,7 +3662,7 @@ casino={
 	stop(){
 
 		clearInterval(this.roll_sound_timer)
-		clearInterval(this.roll_rimer)
+		clearInterval(this.roll_timer)
 		const result=irnd(0,5)
 		objects.casino_icon.tilePosition.y=-90*result
 		let city_id=0
@@ -3714,7 +3714,7 @@ casino={
 	clear(){
 		
 		clearInterval(this.roll_sound_timer)
-		clearInterval(this.roll_rimer)
+		clearInterval(this.roll_timer)
 		some_process.casino_roll=()=>{}
 		objects.casino_cont.visible=false
 		
