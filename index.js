@@ -2044,8 +2044,7 @@ timer={
 			objects.opp_card_cont.alpha=1
 			objects.timer_cont.x=objects.opp_card_cont.sx+objects.opp_avatar.x+objects.opp_avatar.width*0.5			
 		}
-
-
+		
 	},
 
 	update_text(){
@@ -4074,12 +4073,9 @@ online_game={
 		sound.play('start2')
 
 		//показываем кнопки
-		objects.exit_bot_btn.visible=false
-		objects.chat_btn.visible=true
+		anim3.add(objects.game_btns_cont,{y:[800,objects.game_btns_cont.sy,'linear']}, true, 0.3)
 		objects.stickers_btn.visible=true
-		objects.coupons_btn.visible=true
-		objects.coupons_btn_num.visible=true
-		objects.giveup_btn.visible=true
+		objects.chat_btn.visible=true
 		
 		
 		//общие параметры
@@ -4106,6 +4102,11 @@ online_game={
 	},
 
 	async exit_btn_down(){
+
+		if (anim3.any_on()||!this.on){
+			sound.play('locked');
+			return
+		}
 
 		/*if (Date.now()-this.start_time<10000){
 			message.add(['Нельзя сдаваться в начале игры','can nott give up at the beginning of the game'][LANG])
@@ -4157,17 +4158,7 @@ online_game={
 		stickers.show_panel()
 		
 	},
-	
-	giveup_btn_down(){
 		
-		if (anim3.any_on()||!this.on){
-			sound.play('locked');
-			return
-		}
-		
-		this.exit_btn_down()
-	},
-	
 	exch_btn_down(){
 		
 		if (anim3.any_on()||!this.on){
@@ -4300,12 +4291,9 @@ bot_game={
 		opponent=this
 		
 		//показываем кнопки
-		objects.exit_bot_btn.visible=true
-		objects.chat_btn.visible=false
+		anim3.add(objects.game_btns_cont,{y:[800,objects.game_btns_cont.sy,'linear']}, true, 0.3)
 		objects.stickers_btn.visible=false
-		objects.coupons_btn.visible=true
-		objects.coupons_btn_num.visible=true
-		objects.giveup_btn.visible=false
+		objects.chat_btn.visible=false
 		
 	
 		objects.timer_text.text='!!!'
@@ -5330,7 +5318,8 @@ common={
 	
 	update_coupons_btn(){
 		
-		objects.coupons_btn_num.text=my_data.coupons[0]+my_data.coupons[1]+my_data.coupons[2]+my_data.coupons[3]+this.temp_coupons[0]+this.temp_coupons[1]
+		objects.temp_coupons_btn_num.text=this.temp_coupons[0]+this.temp_coupons[1]
+		objects.perm_coupons_btn_num.text=my_data.coupons[0]+my_data.coupons[1]+my_data.coupons[2]+my_data.coupons[3]
 		
 	},
 	
