@@ -4097,6 +4097,10 @@ online_game={
 
 		sound.play('start2')
 
+		//вычиcляем рейтинг при проигрыше и устанавливаем его в базу он потом изменится
+		const lose_rating = this.calc_new_rating(my_data.rating, LOSE)
+		fbs.ref('players/'+my_data.uid+'/rating').set(lose_rating)
+
 		//показываем кнопки
 		anim3.add(objects.game_btns_cont,{y:[800,objects.game_btns_cont.sy,'linear']}, true, 0.3)
 		objects.stickers_btn.visible=true
