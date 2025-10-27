@@ -4716,7 +4716,7 @@ common={
 		dice.set_random()
 		game_msgs.activate()
 		
-		this.prepare_cells(params.auc_data)
+		this.prepare_cells(params.auc)
 		
 		//начальный баланс
 		this.set_money(1,START_CAPITAL)
