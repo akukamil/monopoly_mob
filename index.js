@@ -815,7 +815,7 @@ req_dialog={
 
 		main_menu.close();
 		lobby.close();
-		online_game.activate(seed,1);
+		online_game.activate({turn:1,auc});
 
 	},
 
