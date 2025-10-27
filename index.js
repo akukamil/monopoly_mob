@@ -5531,6 +5531,8 @@ common={
 		anim3.add(objects.game_btns_cont,{y:[objects.game_btns_cont.y,800,'linear']}, false, 0.3)				
 		await opponent.stop(res)
 		
+		ad.show()
+		
 		//обновляем почтовый ящик
 		fbs.ref('inbox/'+my_data.uid).remove()
 		
@@ -5542,6 +5544,28 @@ common={
 		
 	}
 
+}
+
+ad={
+
+	async show() {
+
+		if (game_platform==="YANDEX") {
+			//показываем рекламу
+			await new Promise(resolver=>{
+				window.ysdk.adv.showFullscreenAdv({
+					callbacks: {
+						onClose: function() {resolver()},
+						onError: function() {resolver()},
+					}
+				})
+			})
+		}
+
+		if (game_platform==="VK") {
+			await vkBridge.send("VKWebAppShowNativeAds", {ad_format:"interstitial"})
+		}
+	}
 }
 
 vk={
