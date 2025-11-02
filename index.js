@@ -1,5 +1,5 @@
 const M_WIDTH=450, M_HEIGHT=800;
-var app, assets={},fbs,SERVER_TM, game_name='monopoly', yndx_payments, game, client_id, objects={}, state='',my_role="", game_tick=0, made_moves=0, game_id=0, my_turn=0,my_turn_started=0, opponent=0,connected = 1, LANG = 0, hidden=0, h_state=0, game_platform="",git_src='./', room_name = '',pending_player='',tm={}, some_process = {}, my_data={opp_id : ''},opp_data={};
+var app, assets={},fbs,SERVER_TM, game_name='monopoly', yndx_payments, game, client_id, objects={}, state='',my_role="", game_tick=0, made_moves=0, game_id=0, my_turn=0,my_turn_started=0, opponent=0,connected = 1, LANG = 0, hidden=0, h_state=0, game_platform="",git_src='', room_name = '',pending_player='',tm={}, some_process = {}, my_data={opp_id : ''},opp_data={};
 const CASINO_PRICE_TO_PAY=100
 const START_CAPITAL=1000
 const WIN = 1, DRAW = 0, LOSE = -1, NOSYNC = 2;
