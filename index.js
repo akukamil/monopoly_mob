@@ -6959,6 +6959,8 @@ main_loader={
 	},
 
 	async load1(){
+		
+		git_src='https://monopoly-mob.hb.ru-msk.vkcloud-storage.ru/'
 
 
 		const loader=new PIXI.Loader();
