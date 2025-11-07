@@ -4680,11 +4680,13 @@ common={
 			objects.end_turn_btn.visible=false
 		}
 
+		
+
 		this.place_chip(objects.white_chip,0)
 		this.place_chip(objects.yellow_chip,0)
 		
 		if (game_platform==='VK')
-			vkBridge.send('VKWebAppShowBannerAd', {banner_location: 'top',layout_type:'overlay'});
+			vkBridge.send('VKWebAppShowBannerAd', {banner_location: 'top',layout_type:'resize'});
 
 		objects.cells_cont.visible=true
 
