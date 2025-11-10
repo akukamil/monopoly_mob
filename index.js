@@ -7379,7 +7379,7 @@ async function init_game_env(lang) {
 	some_process.loup_anim=()=>{objects.id_gear.rotation+=0.02}
 
 	//загрузка сокета
-	await auth.load_script(TW_PATH+'/my_ws.js');
+	await auth2.load_script(TW_PATH+'/my_ws.js');
 
 	//загружаем остальные данные из файербейса
 	const other_data = await fbs_once('players/' + my_data.uid)
