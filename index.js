@@ -1965,6 +1965,14 @@ auth2={
 			my_data.orig_pic_url = 'mavatar'+my_data.uid;
 			return;
 		}
+		
+		if (game_platform === 'RS') {
+
+			my_data.uid = this.search_in_local_storage() || this.get_random_uid_for_local('RS_');
+			my_data.name = this.get_random_name(my_data.uid);
+			my_data.orig_pic_url = 'mavatar'+my_data.uid;
+			return;
+		}
 
 		if (game_platform === 'DEBUG') {
 
@@ -7276,6 +7284,12 @@ async function define_platform_and_language() {
 
 		game_platform = 'CRAZYGAMES';
 		LANG = 1;
+		return;
+	}
+
+	if (s.includes('apk')) {
+		game_platform = 'RS';
+		LANG = await language_dialog.show();
 		return;
 	}
 
