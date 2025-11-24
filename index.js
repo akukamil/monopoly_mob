@@ -7289,7 +7289,7 @@ async function define_platform_and_language() {
 
 	if (s.includes('apk')) {
 		game_platform = 'RS';
-		LANG = await language_dialog.show();
+		LANG = 0;
 		return;
 	}
 
