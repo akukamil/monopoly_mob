@@ -7112,7 +7112,7 @@ main_loader={
 
 		this.divide_texture(assets.dice_pack,120,120,['d1','d2','d3','d4','d5','d6','roll0','roll1','roll2'])
 		this.divide_texture(assets.houses_pack,80,50,['house1_icon','house2_icon','house3_icon','house4_icon','hotel_icon'])
-		this.divide_texture(assets.coupons_pack,110,70,['coupon_0_icon','coupon_1_icon','coupon_2_icon','coupon_3_icon'])
+		this.divide_texture(assets.coupons_pack,165,105,['coupon_0_icon','coupon_1_icon','coupon_2_icon','coupon_3_icon'])
 
 
 
