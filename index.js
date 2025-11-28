@@ -34,10 +34,6 @@ const chip_anchors=[
 	{dx:0,dy:-1,ang:0}
 ]
 
-r2 = (v)=>{
-	return (v >= 0 || -1) * Math.round(Math.abs(v)*10000)/10000;
-}
-
 irnd = function(min,max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -53,7 +49,7 @@ anim3={
 	c5: (2 * Math.PI) / 4.5,
 	empty_spr : {x:0,visible:false,ready:true, alpha:0},
 
-	slots: new Array(20).fill().map(u => ({obj:{},on:0,block:true,params_num:0,p_resolve:0,progress:0,vis_on_end:false,tm:0,params:new Array(10).fill().map(u => ({param:'x',s:0,f:0,d:0,func:this.linear}))})),
+	slots: new Array(50).fill().map(u => ({obj:{},on:0,block:true,params_num:0,p_resolve:0,progress:0,vis_on_end:false,tm:0,params:new Array(10).fill().map(u => ({param:'x',s:0,f:0,d:0,func:this.linear}))})),
 
 	any_on() {
 
@@ -4163,11 +4159,6 @@ online_game={
 			return
 		}
 
-		/*if (Date.now()-this.start_time<10000){
-			message.add(['Нельзя сдаваться в начале игры','can nott give up at the beginning of the game'][LANG])
-			return;
-		}*/
-
 		let res = await confirm_dialog.show(['Сдаетесь?','Giveup?'][LANG]);
 		if (res==='ok'&&this.on){
 			fbs.ref('inbox/'+opp_data.uid).push({m:'END',s:my_data.uid,tm:Date.now()});
@@ -6951,22 +6942,20 @@ main_loader={
 
 	preload_assets:0,
 
-	spritesheet_to_tex(t,xframes,yframes,total_w,total_h,xoffset,yoffset){
-
-
-		const frame_width=xframes?total_w/xframes:0;
-		const frame_height=yframes?total_h/yframes:0;
-
-		const textures=[];
-		for (let y=0;y<yframes;y++){
-			for (let x=0;x<xframes;x++){
-
-				const rect = new PIXI.Rectangle(xoffset+x*frame_width, yoffset+y*frame_height, frame_width, frame_height);
-				const quadTexture = new PIXI.Texture(t.baseTexture, rect);
-				textures.push(quadTexture);
+	divide_texture(t,frame_w,frame_h, names){
+		
+		const frames_x=t.width/frame_w
+		const frames_y=t.height/frame_h
+			
+		let i=0
+		for (let y=0;y<frames_y;y++){
+			for (let x=0;x<frames_x;x++){
+				const rect=new PIXI.Rectangle(x*frame_w, y*frame_h, frame_w, frame_h)
+				assets[names[i]]=new PIXI.Texture(t.baseTexture, rect)
+				i++
 			}
 		}
-		return textures;
+
 	},
 
 	async load1(){
@@ -7120,6 +7109,13 @@ main_loader={
 			assets[res_name]=res.texture||res.sound||res.data;
 		}
 
+
+		this.divide_texture(assets.dice_pack,120,120,['d1','d2','d3','d4','d5','d6','roll0','roll1','roll2'])
+		this.divide_texture(assets.houses_pack,80,50,['house1_icon','house2_icon','house3_icon','house4_icon','hotel_icon'])
+		this.divide_texture(assets.coupons_pack,110,70,['coupon_0_icon','coupon_1_icon','coupon_2_icon','coupon_3_icon'])
+
+
+
 		await anim3.add(objects.load_cont,{alpha:[1,0,'linear']}, false, 0.25);
 
 		//создаем спрайты и массивы спрайтов и запускаем первую часть кода
@@ -7245,6 +7241,65 @@ tabvis={
 		anim3.process();
 
 	}
+}
+
+sparks={
+	
+	init(){
+		
+		for (let i=0;i<objects.sparks.length;i++)
+			this.restart_spark(objects.sparks[i])		
+		some_process.sparks=this.process.bind(sparks)
+		
+	},
+	
+	restart_spark(spark){
+		
+		spark.x=irnd(0,M_WIDTH)
+		spark.y=irnd(0,300)
+		const tm=Date.now()
+		
+		const rang=Math.random()*6.25
+		const rspd=Math.random()*0.4+0.1
+		spark.dx=Math.sin(rang)*rspd
+		spark.dy=Math.cos(rang)*rspd
+		spark.tm=tm
+		const tar_alpha=Math.random()*0.4+0.1
+		anim3.add(spark,{alpha:[0,tar_alpha,'linear']},true, 0.5,false);
+		spark.state=1
+		spark.scale_xy=Math.random()*0.9+0.1
+		
+	},
+	
+	close_spark(spark){
+		
+		spark.state=2
+		anim3.add(spark,{alpha:[spark.alpha, 0,'linear']},true, 2,false).then(()=>{
+			spark.state=0
+		})
+		
+	},
+	
+	process(){		
+		
+		const tm=Date.now()
+		
+		for (let i=0;i<objects.sparks.length;i++){
+			
+			const spark=objects.sparks[i]
+			spark.x+=spark.dx
+			spark.y+=spark.dy
+			
+			if (spark.x>M_WIDTH||spark.x<0||spark.y>300||spark.y<0||spark.state===0)
+				this.restart_spark(spark)
+			
+			if (spark.state===1 && tm>spark.tm+3000)
+				this.close_spark(spark)
+			
+		}
+		
+	}
+	
 }
 
 async function define_platform_and_language() {
@@ -7508,6 +7563,7 @@ async function init_game_env(lang) {
 	window.addEventListener('keydown', function(event) { keyboard.keydown(event.key)});
 	//window.addEventListener('contextmenu', event => event.preventDefault());
 
+	sparks.init()
 	main_menu.activate();
 
 	//покупки яндекса
