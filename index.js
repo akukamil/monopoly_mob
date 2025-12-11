@@ -3217,7 +3217,7 @@ coupons_dlg={
 			
 			sound.play('coupon_used')
 			game_msgs.add('Вы использовали купон для освобождения от ренты на 3 случая')
-			common.my_no_rent_bonus=3
+			common.change_rent_bonus(1,3,'set')
 			opponent.send({s:my_data.uid,type:'coupon',id:this.active_coupon_id,tm:Date.now()})
 			common.consume_coupon(this.active_coupon_id)
 			this.close()
@@ -3887,7 +3887,7 @@ casino={
 		if (result===5){
 			game_msgs.add('Вы выиграли освобождение от ренты на 2 случая!')
 			sound.play('norent')
-			common.my_no_rent_bonus=2
+			common.change_rent_bonus(1,2,'set')
 		}
 
 		opponent.send({s:my_data.uid,type:'casino_result',result,city_id,tm:Date.now()})
@@ -4830,7 +4830,7 @@ bot_game={
 			game_msgs.add('Соперник не смог купить город по акции!')
 		}
 		if (result===5){
-			common.opp_no_rent_bonus=2
+			common.change_rent_bonus(2,2)
 			sound.play('norent')
 			game_msgs.add('Соперник освобожден от ренты на 2 случая')
 		}
@@ -4874,8 +4874,8 @@ common={
 
 		
 		//бонусы не платить ренту
-		this.my_no_rent_bonus=0
-		this.opp_no_rent_bonus=0
+		this.change_rent_bonus(1,0,'set')
+		this.change_rent_bonus(2,0,'set')
 		this.temp_coupons=[0,0]
 		this.perm_coupons_used=[0,0,0,0]		
 		
@@ -5159,6 +5159,39 @@ common={
 
 	},
 
+	change_rent_bonus(player, value, mode = 'add') {
+		
+		if (player === 1){
+			if (mode === 'set')
+				this.my_no_rent_bonus = value
+			else
+				this.my_no_rent_bonus += value
+				
+			if (this.my_no_rent_bonus===0){
+				objects.my_card_norent.visible=false
+				return
+			}
+			objects.my_card_norent.visible=true
+			objects.my_card_norent.text = `NO RENT (${this.my_no_rent_bonus})`
+			anim3.add(objects.my_card_norent,{x:[objects.my_card_norent.x, objects.my_card_norent.x+10,'shake']}, true, 0.15)
+		}
+		
+		if (player === 2) {
+			if (mode === 'set')
+				this.opp_no_rent_bonus = value
+			else
+				this.opp_no_rent_bonus += value
+				
+			if (this.opp_no_rent_bonus===0){
+				objects.opp_card_norent.visible=false
+				return
+			}
+			objects.opp_card_norent.visible=true
+			objects.opp_card_norent.text = `NO RENT (${this.opp_no_rent_bonus})`
+			anim3.add(objects.opp_card_norent,{x:[objects.opp_card_norent.x, objects.opp_card_norent.x+10,'shake']}, true, 0.15)
+		}
+	},
+
 	async move_chip(chip, steps){
 		
 		this.move_on=1
@@ -5230,7 +5263,7 @@ common={
 					//оппонент приземлился на мой участок
 					if (this.opp_no_rent_bonus){
 						sound.play('norent')
-						this.opp_no_rent_bonus--
+						this.change_rent_bonus(2,-1)
 						
 						if (this.opp_no_rent_bonus===0)
 							sys_msg.add('Это было последнее освобождение от ренты')
@@ -5252,7 +5285,7 @@ common={
 					//я приземлился на участок соперника
 					if(this.my_no_rent_bonus){
 						sound.play('norent')
-						this.my_no_rent_bonus--
+						this.change_rent_bonus(1,-1)
 						
 						if (this.my_no_rent_bonus===0)
 							sys_msg.add('Это было последнее освобождение от ренты')
@@ -5416,7 +5449,7 @@ common={
 			if (move_data.result===5){
 				game_msgs.add('Соперник не платит ренту 2 раза!')
 				sound.play('norent')
-				common.opp_no_rent_bonus=2
+				this.change_rent_bonus(2,2,'set')
 			}
 		}
 
@@ -5433,7 +5466,7 @@ common={
 			if (move_data.id===3){
 				sound.play('coupon_used')
 				game_msgs.add('Соперник использовал купон для освобождения от ренты на 3 случая')
-				common.opp_no_rent_bonus=3
+				this.change_rent_bonus(2,3,'set')
 			}
 			
 		}
