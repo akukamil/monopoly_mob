@@ -4908,13 +4908,13 @@ common={
 		
 		sound.play('game_start')
 		
-		objects.my_avatar.texture=players_cache.players[my_data.uid].texture
+		objects.my_avatar.set_texture(players_cache.players[my_data.uid].texture)
 
 		//показываем и заполняем карточку соперника
 		anim3.add(objects.opp_card_cont,{x:[800,objects.opp_card_cont.sx,'linear'],alpha:[0,my_turn?0.5:1,'linear']}, true, 0.3)
 		objects.opp_card_name.set2(opp_data.name,160);
 		objects.opp_card_rating.text=opp_data.rating;
-		objects.opp_avatar.texture=players_cache.players[opp_data.uid].texture
+		objects.opp_avatar.set_texture(players_cache.players[opp_data.uid].texture)
 
 	},
 	
