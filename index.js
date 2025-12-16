@@ -7702,7 +7702,7 @@ async function init_game_env(lang) {
 	await main_loader.load1()
 	await main_loader.load2()
 
-	anim3.add(objects.id_cont,{alpha:[0,1,'linear'],y:[-200,objects.id_cont.sy,'easeOutBack']}, true,0.5);
+	anim3.add(objects.id_cont,{alpha:[0,1,'linear'],x:[-300,objects.id_cont.sx,'easeOutBack']}, true,0.5);
 	some_process.loup_anim=()=>{objects.id_gear.rotation+=0.02}
 
 	//загрузка сокета
