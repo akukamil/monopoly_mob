@@ -5868,15 +5868,12 @@ main_menu={
 
 		//проверяем и включаем музыку
 		//music.activate();
-		objects.main_menu_cont.visible=true;
 
 
-		
-		anim3.add(objects.bcg,{alpha:[0,1,'linear']}, true, 0.5);
+		anim3.add(objects.load_cont,{alpha:[0,1,'linear']}, true, 0.5)
+		anim3.add(objects.bcg,{alpha:[0,1,'linear']}, true, 0.5)
 
-		anim3.add(objects.main_menu_cont,{alpha:[0,1,'linear']}, true, 0.5);
-
-		anim3.add(objects.title_online,{x:[850,objects.title_online.sx,'easeOutBack']}, true, 0.5);
+		//anim3.add(objects.title_online,{x:[850,objects.title_online.sx,'easeOutBack']}, true, 0.5);
 
 		this.prv_anim_tm=Date.now()
 		this.prv_bliq_tm=Date.now()
@@ -5925,11 +5922,9 @@ main_menu={
 		//игровой титл
 
 		//anim3.add(objects.bcg,{alpha:[1,0]}, false, 0.5,'linear');
-
+		anim3.add(objects.load_cont,{alpha:[1,0,'linear']}, false, 0.5)
 		anim3.add(objects.main_btn_cont,{y:[objects.main_btn_cont.y,800,'linear']}, false, 0.5);
 
-		//кнопки
-		anim3.add(objects.main_menu_cont,{alpha:[1,0,'linear']}, false, 0.5);
 
 		clearInterval(this.process_timer)
 
@@ -7196,6 +7191,7 @@ function kill_game () {
 main_loader={
 
 	preload_assets:0,
+	init_load_list:0,
 
 	divide_texture(t,frame_w,frame_h, names){
 		
@@ -7233,80 +7229,40 @@ main_loader={
 		
 		git_src=''
 
-
 		const loader=new PIXI.Loader();
-
-		//добавляем текстуры из листа загрузки
-		loader.add('load_bar_bcg', git_src+'res/'+'common/load_bar_bcg.png');
-		loader.add('main_bcg', git_src+'res/common/main_bcg.jpg');
-		loader.add('load_bar_progress', git_src+'res/'+'common/load_bar_progress.png');
-		loader.add('mfont2',git_src+'fonts/core_sans_ds_32/font.fnt');
-		loader.add('main_load_list',git_src+'load_list.txt');
-
-		//переносим все в ассеты
+		
+		loader.add('init_load_list',git_src+'res/common/load_list.txt');
 		await new Promise(res=>loader.load(res))
+		
+		
+		//добавляем из запускного листа загрузки
+		this.init_load_list=eval(loader.resources.init_load_list.data)
+		for (let i = 0; i < this.init_load_list.length; i++)
+			if (this.init_load_list[i].class==='sprite' || this.init_load_list[i].class==='image')
+				loader.add(this.init_load_list[i].name, git_src+'res/common/' + this.init_load_list[i].name + '.' +  this.init_load_list[i].image_format);
+		loader.add('main_load_list',git_src+'load_list.txt');
+		loader.add('mfont2',git_src+'fonts/core_sans_ds_32/font.fnt');
+			
+		//загружаем
+		await new Promise(res=>loader.load(res))
+				
+		//переносим все в ассеты
 		for (const res_name in loader.resources){
 			const res=loader.resources[res_name];
 			assets[res_name]=res.texture||res.sound||res.data;
 		}
-
-		//главный бэкграунд
-		objects.bcg=new PIXI.Sprite(assets.main_bcg)
-		objects.bcg.width=470
-		objects.bcg.height=820
-		objects.bcg.x=-10
-		objects.bcg.y=-10
-		app.stage.addChild(objects.bcg)
 		
-		const load_bar_bcg=new PIXI.Sprite(assets.load_bar_bcg);
-		load_bar_bcg.x=0;
-		load_bar_bcg.y=360;
-		load_bar_bcg.width=450;
-		load_bar_bcg.height=70;
-		
-		
-
-		this.load_bar_mask=new PIXI.Graphics();
-		this.load_bar_mask.beginFill(0xff0000);
-		this.load_bar_mask.drawRect(0,0,1,40);
-		this.load_bar_mask.x=20;
-		this.load_bar_mask.y=380;
-
-		const load_bar_progress=new PIXI.Sprite(assets.load_bar_progress);
-		load_bar_progress.x=0;
-		load_bar_progress.y=390;
-		load_bar_progress.width=450;
-		load_bar_progress.height=40;
-		load_bar_progress.mask=this.load_bar_mask
-
-		this.t_progress=new PIXI.BitmapText('', {fontName: 'mfont32',fontSize: 18,align: 'center'})
-		this.t_progress.y=420
-		this.t_progress.x=430
-		this.t_progress.tint=0xffffff
-		this.t_progress.anchor.set(1,0)
-
-		this.t_info=new PIXI.BitmapText(['Загрузка...','Loading...'][LANG], {fontName: 'mfont32',fontSize: 20,align: 'center'});
-		this.t_info.y=385
-		this.t_info.x=225
-		this.t_info.tint=0xffffff
-		this.t_info.anchor.set(0.5,0.5)
-
-		objects.load_cont=new PIXI.Container();
-		objects.load_cont.pivot.x=M_WIDTH*0.5
-		objects.load_cont.pivot.y=M_HEIGHT*0.5
-		objects.load_cont.x=M_WIDTH*0.5
-		objects.load_cont.y=M_HEIGHT*0.5
-		objects.load_cont.addChild(load_bar_bcg,load_bar_progress,this.load_bar_mask,this.t_info,this.t_progress)
-		app.stage.addChild(objects.load_cont);
-
+		//убираем надпись
+		const l_text=document.getElementById('loadingText')
+		if(l_text)
+			document.getElementById('loadingText').remove();
+	
 	},
 
 	async load2(){
 
 		//подпапка с ресурсами
 		const lang_pack = 'VK_MOB'
-
-		const bundle=[];
 
 		const loader=new PIXI.Loader();
 
@@ -7366,83 +7322,93 @@ main_loader={
 
 		//прогресс
 		loader.onProgress.add((l,res)=>{
-			this.load_bar_mask.width =410*l.progress*0.01;
-			this.t_progress.text=Math.round(l.progress)+'%';
+			objects.load_progress_mask.width =410*l.progress*0.01;
+			//objects.t_progress.text=Math.round(l.progress)+'%';
 			});
 
 		//ждем загрузки
 		await new Promise(res=>loader.load(res))
 
 		//переносим все в ассеты
-		await new Promise(res=>loader.load(res))
 		for (const res_name in loader.resources){
 			const res=loader.resources[res_name];
 			assets[res_name]=res.texture||res.sound||res.data;
 		}
+		
+		//загрузочный бар
+		objects.load_progress_mask.visible=false
+		objects.load_bar_progress.visible=false
+		objects.load_bar_bcg.visible=false
+		
 
 		this.divide_texture(assets.dice_pack,120,120,['d1','d2','d3','d4','d5','d6','roll0','roll1','roll2'])
 		this.divide_texture(assets.houses_pack,80,50,['house1_icon','house2_icon','house3_icon','house4_icon','hotel_icon'])
 		this.divide_texture(assets.coupons_pack,165,105,['coupon_0_icon','coupon_1_icon','coupon_2_icon','coupon_3_icon'])
 		this.divide_texture(assets.rsp_pack,150,150,'rsp_icons')
 
-		await anim3.add(objects.load_cont,{alpha:[1,0,'linear']}, false, 0.25);
+		//await anim3.add(objects.load_cont,{alpha:[1,0,'linear']}, false, 0.25);
+		this.process_load_list(load_list)
 
+	},
+	
+	process_load_list(load_list){
+		
 		//создаем спрайты и массивы спрайтов и запускаем первую часть кода
-		const main_load_list=eval(assets.main_load_list);
-		for (var i = 0; i < main_load_list.length; i++) {
-			const obj_class = main_load_list[i].class;
-			const obj_name = main_load_list[i].name;
+		
+		for (var i = 0; i < load_list.length; i++) {
+			const obj_class = load_list[i].class;
+			const obj_name = load_list[i].name;
 			console.log('Processing: ' + obj_name)
 
 			switch (obj_class) {
 			case "sprite":
 				objects[obj_name] = new PIXI.Sprite(assets[obj_name]);
-				eval(main_load_list[i].code0);
+				eval(load_list[i].code0);
 				break;
 
 			case "block":
 				if (obj_name==='cells')
-					console.log(main_load_list[i].code)
-				eval(main_load_list[i].code0);
+					console.log(load_list[i].code)
+				eval(load_list[i].code0);
 				break;
 
 			case "cont":
-				eval(main_load_list[i].code0);
+				eval(load_list[i].code0);
 				break;
 
 			case "array":
-				var a_size=main_load_list[i].size;
+				var a_size=load_list[i].size;
 				objects[obj_name]=[];
 				for (var n=0;n<a_size;n++)
-					eval(main_load_list[i].code0);
+					eval(load_list[i].code0);
 				break;
 			}
 		}
 
 		//обрабатываем вторую часть кода в объектах
-		for (var i = 0; i < main_load_list.length; i++) {
-			const obj_class = main_load_list[i].class;
-			const obj_name = main_load_list[i].name;
+		for (var i = 0; i < load_list.length; i++) {
+			const obj_class = load_list[i].class;
+			const obj_name = load_list[i].name;
 			console.log('Processing: ' + obj_name)
 
 
 			switch (obj_class) {
 			case "sprite":
-				eval(main_load_list[i].code1);
+				eval(load_list[i].code1);
 				break;
 
 			case "block":
-				eval(main_load_list[i].code1);
+				eval(load_list[i].code1);
 				break;
 
 			case "cont":
-				eval(main_load_list[i].code1);
+				eval(load_list[i].code1);
 				break;
 
 			case "array":
-				var a_size=main_load_list[i].size;
+				var a_size=load_list[i].size;
 					for (var n=0;n<a_size;n++)
-						eval(main_load_list[i].code1);	;
+						eval(load_list[i].code1);	;
 				break;
 			}
 		}
@@ -7652,7 +7618,9 @@ async function init_game_env(lang) {
 		//коротко файрбейс
 		fbs=firebase.database();
 	}
-
+	
+	await main_loader.load1()
+	
 	//создаем приложение пикси
 	document.body.innerHTML='<style>html,body {margin: 0;padding: 0;height: 100%;}body {display: flex;align-items:center;justify-content: center;background-color: rgba(1,168,246,1)}</style>';
 	app = new PIXI.Application({width:M_WIDTH, height:M_HEIGHT,antialias:false,backgroundColor : 0x01A8F6});
@@ -7692,6 +7660,8 @@ async function init_game_env(lang) {
 		this.endFill();
 	}
 
+	main_loader.process_load_list(main_loader.init_load_list)
+
 	//события изменения окна
 	resize();
 	window.addEventListener('resize', resize)
@@ -7699,7 +7669,8 @@ async function init_game_env(lang) {
 	//запускаем главный цикл
 	main_loop()
 
-	await main_loader.load1()
+
+	
 	await main_loader.load2()
 
 	anim3.add(objects.id_cont,{alpha:[0,1,'linear'],x:[-300,objects.id_cont.sx,'easeOutBack']}, true,0.5);
