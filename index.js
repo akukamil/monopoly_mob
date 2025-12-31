@@ -1804,7 +1804,7 @@ auth2={
 
 		//сохраняем этот uid в локальном хранилище
 		try {
-			localStorage.setItem('poker_uid', uid);
+			localStorage.setItem('monopoly_uid', uid);
 		} catch (e) {alert(e)}
 
 		return uid;
@@ -1865,7 +1865,7 @@ auth2={
 		let local_uid = null;
 
 		try {
-			local_uid = localStorage.getItem('poker_uid');
+			local_uid = localStorage.getItem('monopoly_uid');
 		} catch (e) {alert(e)}
 
 		if (local_uid !== null) return local_uid;
@@ -7243,8 +7243,8 @@ main_loader={
 		for (let i = 0; i < this.init_load_list.length; i++)
 			if (this.init_load_list[i].class==='sprite' || this.init_load_list[i].class==='image')
 				loader.add(this.init_load_list[i].name, git_src+'res/common/' + this.init_load_list[i].name + '.' +  this.init_load_list[i].image_format);
-		loader.add('main_load_list',git_src+'load_list.txt');
-		loader.add('mfont2',git_src+'fonts/core_sans_ds_32/font.fnt');
+		loader.add('main_load_list',git_src+'load_list.txt')
+		loader.add('mfont2',git_src+'fonts/core_sans_ds_32/font.fnt')
 			
 		//загружаем
 		await new Promise(res=>loader.load(res))
