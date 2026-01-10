@@ -1745,6 +1745,7 @@ keyboard={
 		}
 
 		if (key==='RU'||key==='EN'){
+			return
 			this.switch_layout();
 			key ='';
 		}
